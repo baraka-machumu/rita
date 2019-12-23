@@ -1,0 +1,118 @@
+
+
+
+.btn {
+
+    border-radius: 0;
+}
+
+
+
+
+.checkbox-custom {
+
+    height: 15px;
+    width: 60px;
+    margin-left: 0;
+}
+
+.perm-role-span {
+    height: 10px;
+    width: 70px;
+    margin-left: 0;
+    margin-top: -2px;
+}
+.rol-perm-list{
+
+  list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+.tr-background-title {
+
+    background-color: #0E6BB7;
+    color: black;
+}
+
+.panel-dashboard{
+
+    height: 120px;
+    background-color: white;
+
+
+}
+
+
+.dashboard-panel-title {
+    height: 40px;
+    background-color: #0E6BB7;
+    color: white;
+    border: solid #0E6BB7;
+    border-radius: 3px;
+}
+
+
+.dashboard-panel-title >span {
+
+    font-size: 14px;
+
+}
+
+
+.dashboard-panel-content {
+
+    background-color: whitesmoke;
+    height: 76px;
+    color: black;
+    border: solid whitesmoke;
+    border-radius: 3px;
+
+}
+
+
+.dashboard-panel-content >span{
+
+    font-size: 20px;
+}
+
+
+
+/*.tab-content {*/
+/*    border-left: 1px solid #ddd;*/
+/*    border-right: 1px solid #ddd;*/
+/*    !*padding: 10px;*!*/
+/*}*/
+
+.tab-pane {
+    border-left: 1px solid #ddd;;
+    border-right: 1px solid #ddd;;
+    border-bottom: 1px solid #ddd;;
+    border-radius: 0px 0px 1px;
+    padding: 2px;
+}
+
+.nav-tabs {
+    margin-bottom: 0;
+}
+
+  .nav .nav-tabs .nav-link  {
+    display: block;
+    background-color: #0E6BB7 !important;
+}
+
+
+  .top-margin-tab{
+
+      margin-top: 20px;
+  }
+
+
+
+
+
+.table-custom td{
+
+    padding: .15rem;
+}
