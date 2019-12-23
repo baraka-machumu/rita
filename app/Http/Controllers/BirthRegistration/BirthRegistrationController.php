@@ -542,7 +542,7 @@ class BirthRegistrationController extends Controller
 //        $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?',array($applicationId,$servTypeId,$handlerId));
 
         $r = true;
-        if ($r){
+        if ($r){re
 
             Session::flash('alert-success','Successful issued');
 
