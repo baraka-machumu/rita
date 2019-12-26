@@ -59,6 +59,8 @@ Route::group(['prefix'=>'birth-certificates'],function (){
 
     Route::get('new-issue/view/{trackerId}','BirthRegistration\BirthRegistrationController@viewIssue');
     Route::post('new/issue/{trackerId}','BirthRegistration\BirthRegistrationController@storeIssue');
+    Route::get('new-certificate/print/{trackerId}','BirthRegistration\BirthRegistrationController@newCertificatePrint');
+    Route::get('new/certificate/{entryNo}','BirthRegistration\BirthRegistrationController@certificate');
 
     //birth dublicates
 

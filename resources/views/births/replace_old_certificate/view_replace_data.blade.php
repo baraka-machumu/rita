@@ -141,11 +141,11 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
-                        <td>{{$result->DoB}}</td>
+                        <td>{{$result->Surname}}</td>
+                        <td>{{$result->DOB}}</td>
                         <td>
 
-                            <a href="{{url('birth-certificates/replace/view/1')}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                            <a href="#" data-toggle="modal" data-target="#check-correct-data-replace-cert" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
 
                         </td>
                     </tr>
@@ -177,7 +177,7 @@
 
                     <button type="submit" name="send-back-result" class="btn btn-success">Verify</button>
 
-                    <a href="{{url('birth-certificates/replace/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
+                    <a href="{{url('birth-certificates/replace/return',$ddata->TrackerID)}}" class="btn btn-success" >Return</a>
 
                 </div>
             </form>
@@ -188,5 +188,7 @@
 
 
     </div>
+
+    @include('births.replace_old_certificate.check_if_data_are_correct_modal')
 
 @endsection

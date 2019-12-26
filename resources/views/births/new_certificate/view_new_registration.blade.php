@@ -1,4 +1,4 @@
-
+view_new_registration.blade.php
 @extends('layouts.master')
 
 

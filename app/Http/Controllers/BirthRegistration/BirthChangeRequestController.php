@@ -78,7 +78,7 @@ class BirthChangeRequestController extends Controller
 
     public function serachByEntryNumber(Request $request,$trackerId){
 
-        $entryNo = 6565;// $request->entryNo;
+        $entryNo =  $request->entryNo;
 
         if (empty($entryNo)){
 
@@ -108,8 +108,15 @@ class BirthChangeRequestController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->first();
 
-        $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
+        $result=  DB::table('DataInfo as d')
+            ->where('d.EntryNo','=',$entryNo)
+            ->join('Sex','Sex.SexID','=','d.SexID')
+            ->join('Country as cn','cn.CountryID','=','d.ChildNationalityID')
+            ->join('Country as mn','mn.CountryID','=','d.MotherNationalityID')
+            ->join('Country as fn','fn.CountryID','=','d.FatherNationalityID')
+            ->first();
 
+//        return response()->json($result);
         $verify =  true;
         $issue  =  false;
         $is_result= true;

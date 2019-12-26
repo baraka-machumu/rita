@@ -116,3 +116,19 @@
 
     padding: .15rem;
 }
+
+
+.modal-content {
+
+    -webkit-border-radius: 0px !important;
+    -moz-border-radius: 0px !important;
+    border-radius: 0px !important;
+}
+
+.modal-header {
+
+    -webkit-border-radius: 0px !important;
+    -moz-border-radius: 0px !important;
+    border-radius: 0px !important;
+    margin-left: 0;
+}

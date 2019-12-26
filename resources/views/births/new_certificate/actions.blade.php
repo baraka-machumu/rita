@@ -32,7 +32,7 @@
                 </div>
             </form>
 
-            @elseif($verify)
+        @elseif($verify)
 
             <form method="post" action="{{url('birth-certificates/new/verify',$trackerId)}}">
 
@@ -69,5 +69,50 @@
 
     </div>
 
+    <div class="col-md-6">
+
+
+        <table class="table table-striped">
+
+            <tbody>
+
+            <tr style="background-color: #0E6BB7; color: white;">
+                <td colspan="12">Comments</td>
+            </tr>
+
+            </tbody>
+        </table>
+
+        <div>
+
+            @foreach($comments as $comment)
+
+                <ul class="list-unstyled timeline">
+                    <li>
+                        <div class="block">
+                            <div class="tags">
+                                <a href="" class="tag">
+                                    <span>{{$comment->CommentType}}</span>
+                                </a>
+                            </div>
+                            <div class="block_content">
+                                <h2 class="title">
+                                    <a>{{$comment->Comment}}</a>
+                                </h2>
+                                <div class="byline">
+                                    <span>{{$comment->Date}}</span> by <a>{{$comment->Username}}</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                    </li>
+                </ul>
+
+            @endforeach
+        </div>
+
+    </div>
 
 </div>

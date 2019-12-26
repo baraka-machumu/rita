@@ -238,7 +238,10 @@ class BirthDuplicateController extends Controller
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
 
-        return redirect('birth-certificates/duplicate/1/issue');
+//        return redirect('birth-certificates/duplicate/1/issue');
+
+        return redirect('birth-certificates/new-certificate/print/'.$trackerId);
+
 
     }
 

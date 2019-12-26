@@ -203,7 +203,8 @@ class BirthRegistrationController extends Controller
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
 
-        return view('births.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+        $comments  =  $this->getComments($trackerId);
+        return view('births.new_certificate.tab_view_info',compact('comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
 
 
     }
@@ -422,7 +423,7 @@ class BirthRegistrationController extends Controller
 
         if ($success){
 
-            $this->commentSave($request,$handlerId,$trackerId);
+            $this->commentSave($request,$handlerId,$trackerId,"Request");
 
             Session::flash('alert-success','Successful Verified');
 
@@ -466,8 +467,10 @@ class BirthRegistrationController extends Controller
         $attachments  =  DB::table('ApplAttachment as aa')
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
+//        dd($trackerId);
+        $comments  =  $this->getComments($trackerId);
 
-        return view('births.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+        return view('births.new_certificate.tab_view_info',compact('comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
 
 
     }
@@ -488,7 +491,7 @@ class BirthRegistrationController extends Controller
 
         if ($success){
 
-            $this->commentSave($request,$handlerId,$trackerId);
+            $this->commentSave($request,$handlerId,$trackerId,"Approve");
 
             Session::flash('alert-success','Successful Verified');
         }
@@ -515,7 +518,8 @@ class BirthRegistrationController extends Controller
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
 
-        return view('births.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+        $comments  =  $this->getComments($trackerId);
+        return view('births.new_certificate.tab_view_info',compact('comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
 
     }
 
@@ -529,55 +533,94 @@ class BirthRegistrationController extends Controller
 
         $statusId  =  $status->StatusID;
 
-
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$statusId]);
 
         $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
 
         $applicationId =  $servApp->ApplicationID;
+//        dd($applicationId);
         $servTypeId  =  1;//$servApp->ServiceTypeID;
 
-       // $this->commentSave($request,$handlerId,$trackerId);
+       $this->commentSave($request,$handlerId,$trackerId,"Issue");
 
-//        $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?',array($applicationId,$servTypeId,$handlerId));
+       DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['NoCopyPrinted'=>$servApp->NoCopyPrinted+1]);
 
-        $r = true;
-        if ($r){re
+        $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?,?',array($applicationId,$servTypeId,$handlerId,null));
 
-            Session::flash('alert-success','Successful issued');
+//        return $result;
 
-            $url  =  "http://localhost:8080/jasperserver";
-            $user  =  "jasperadmin";
-            $password  =  "jasperadmin";
+        if ($result[0]->resultCode==0){
 
-            $server  =  new Client($url,$user,$password);
+            $entryNo  =  DB::table('BirthService')->where('BirthServID',$applicationId)->first()->EntryNo;
+            Session::flash('alert-success','Successful issued now you can print');
 
-            $report_url =  "/reports/rita/birth_certificate";
+            return redirect('birth-certificates/new-certificate/print/'.$entryNo);
 
-            $getReport  =  $server->reportService()->runReport($report_url,'pdf');
-            header('Content-Type: application/pdf');
-            echo   $getReport; exit;
         }
+
 
         else {
 
             Session::flash('alert-danger', 'Failed to issue');
 
         }
+
         $tab  =  2;
         return redirect('birth-certificates/'.$tab.'/new-issue');
 
     }
 
 
+    public  function  newCertificatePrint($entryNo){
 
-    public  function  commentSave(Request $request, $handlerId,$trackerId){
+
+        return view('births.new_certificate.view_new_certificate_to_print',compact('entryNo'));
+
+    }
+
+    public  function  certificate($entryNo){
+
+        $url  =  "http://localhost:8080/jasperserver";
+        $user  =  "jasperadmin";
+        $password  =  "jasperadmin";
+
+        $server  =  new Client($url,$user,$password);
+
+        $report_url =  "/reports/rita/birth_certificate";
+
+        $inputControls   = [
+
+            ['EntryNo'=>$entryNo]
+        ];
+
+        $getReport  =  $server->reportService()->runReport($report_url,'pdf',null,null,$inputControls);
+        header('Content-Type: application/pdf');
+            echo   $getReport;
+
+    }
+
+    public  function  commentSave(Request $request, $handlerId,$trackerId,$type){
 
         $comment  =  new Comment();
 
         $comment->Comment  =  $request->comments;
         $comment->StaffID  =  $handlerId;
         $comment->TrackerID  =  $trackerId;
+        $comment->CommentType  =  $type;
         $comment->save();
+    }
+
+
+
+    public  function  getComments($trackerId){
+
+       $comments  =  DB::table('Comments as c')
+           ->select('s.Username','c.CommentType','c.Comment','c.TrackerID','c.Date')
+           ->where('c.TrackerID','=',$trackerId)
+            ->join('Staff as s','s.StaffID','=','c.StaffID')
+            ->get();
+
+       return $comments;
+
     }
 }
