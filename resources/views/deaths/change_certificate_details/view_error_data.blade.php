@@ -6,6 +6,7 @@
 
     <h2>Informant Details</h2>
 
+
 @endsection
 @section('content')
 
@@ -39,37 +40,96 @@
 
     </div>
 
-    <div class="col-md-6">
-        <table class="table table-striped table-condensed table-custom">
+{{--    <form action="{{url('birth-certificates/correction/verify',$ddata->TrackerID)}}" id="form-send-back-result-verify"  method="post">--}}
+{{--        {{csrf_field()}}--}}
 
-            <tbody>
+{{--        <input type="hidden" name="correctionFlag" value="100">--}}
+{{--        <input type="hidden" name="applicationId" value="{{$ddata->ApplicationID}}">--}}
+{{--        <input type="text" name="trackerId" value="{{$ddata->TrackerID}}">--}}
+    <div class="col-md-12">
 
-            <tr>
-                <th>First Name</th><td>{{$ddata->ChildFname}}</td>
-            </tr>
-            <tr>
-                <th>Middle Name</th><td>{{$ddata->ChildMname}}</td>
-            </tr>
-            <tr>
-                <th>Last Name</th><td>{{$ddata->ChildSurname}}</td>
-            </tr>
+        {{--        <form action="{{url('')}}" method="post">--}}
 
-            <tr>
-                <th>Date Of Birth</th><td>{{$ddata->DOB}}</td>
-            </tr>
 
-            <tr>
-                <th>Attachment</th><td>Not Available</td>
-            </tr>
-            </tbody>
+        <div class="col-md-6" style="margin-bottom: 10px;">
 
-        </table>
 
-        <form method="post" action="{{url('birth-certificates/correction/search-byentry-number',$ddata->TrackerID)}}">
+            <div class="form-group row">
+                <label for="cfirstName" class="col-sm-4 col-form-label">First Name</label>
+                <div class="col-sm-8">
+                    <input type="text" name="cfirstName" class="form-control" id="cfirstName" value="{{$ddata->Fname}}">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="cmiddleName" class="col-sm-4 col-form-label">Middle Name</label>
+                <div class="col-sm-8">
+                    <input type="text" name="cmiddleName" class="form-control" id="cmiddleName" value="{{$ddata->Mname}}">
+                </div>
+            </div>
+
+
+            <div class="form-group row">
+                <label for="clastName" class="col-sm-4 col-form-label">Last Name</label>
+                <div class="col-sm-8">
+                    <input type="text" name="clastName" class="form-control" id="clastName" value="{{$ddata->Surname}}">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="chospital" class="col-sm-4 col-form-label">Hospital Name</label>
+                <div class="col-sm-8">
+                    <input type="text" name="chospital" class="form-control" id="chospital" value="{{$ddata->Surname}}">
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="form-group row">
+                <label for="dob" class="col-sm-4 col-form-label">Date Of Birth</label>
+                <div class="col-sm-8">
+                    <input type="text"   name="dob" class="form-control" id="dob" value="{{$ddata->DOB}}">
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-md-6" style="margin-bottom: 15px;">
+
+
+
+
+            <div class="form-group row">
+                <label for="fcountryBirth" class="col-sm-4 col-form-label">Father Country Of Birth </label>
+                <div class="col-sm-8">
+                    <input type="text" name="fcountryBirth" class="form-control" id="fcountryBirth" value="{{$ddata->DOB}}">
+                </div>
+            </div>
+
+
+            <div class="form-group row">
+                <label for="entryNo" class="col-sm-4 col-form-label">Entry Number</label>
+                <div class="col-sm-8">
+                    <input type="text"  readonly name="entryNo" class="form-control" id="entryNo" value="{{$ddata->DeathEntryNo}}">
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="col-md-12">
+
+        <form method="post" action="{{url('death-certificates/correction/search-byentry-number',$ddata->TrackerID)}}">
 
             {{csrf_field()}}
 
-            <input type="hidden" value="{{$ddata->EntryNo}}" name="entryNo">
+            <input type="hidden" value="{{$ddata->DeathEntryNo}}" name="entryNo">
 
             <button type="submit" class="btn btn-primary">Search</button>
 
@@ -77,43 +137,6 @@
             <a href="{{url()->previous()}}" class="btn btn-info">Back</a>
 
         </form>
-
-
-        @if($issue_search)
-
-            @endif
-
-
-
-    </div>
-    <div class="col-md-6">
-        <table class="table table-striped table-condensed table-custom">
-
-            <tbody>
-            <tr>
-                <th>Phone Number</th><td>{{$ddata->PhoneNo}}</td>
-            </tr>
-
-            <tr>
-                <th>Mother First Name</th><td>{{$ddata->MotherFname}}</td>
-            </tr>
-
-
-            <tr>
-                <th>Mother  SurName</th><td>{{$ddata->MotherSurname}}</td>
-            </tr>
-
-            <tr>
-                <th>Entry Number </th><td>{{$ddata->EntryNo}}</td>
-            </tr>
-
-
-
-            </tbody>
-
-
-
-        </table>
 
     </div>
     @if($is_result)
@@ -145,11 +168,11 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
+                        <td>{{$result->Surname}}</td>
                         <td>{{$result->DOB}}</td>
                         <td>
 
-                            <a href="{{url('birth-certificates/correction/view/1')}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                            <a href="#" data-toggle="modal" data-target="#data-death-error-modal" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
 
                         </td>
                     </tr>
@@ -166,9 +189,8 @@
             </table>
 
 
-            <form action="{{url('birth-certificates/correction/verify',$ddata->TrackerID)}}"  method="post">
+            <form method="post" action="{{url('death-certificates/correction/return',$ddata->TrackerID)}}">
 
-                {{csrf_field()}}
 
                 <div class="form-group">
 
@@ -179,9 +201,11 @@
 
                 <div class="form-group">
 
-                    <button type="submit" name="send-back-result" class="btn btn-success">Verify</button>
+{{--                    <button type="submit" id="send-back-result-verify" name="send-back-result" class="btn btn-success">Verify</button>--}}
 
-                    <a href="{{url('birth-certificates/correction/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
+
+                        <button  type="submit" class="btn btn-success">Return</button>
+
 
                 </div>
             </form>
@@ -190,7 +214,10 @@
         </div>
     @endif
 
+{{--    </form>--}}
 
     </div>
+
+    @include('deaths.change_certificate_details.data_error_modal')
 
 @endsection

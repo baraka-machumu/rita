@@ -18,7 +18,6 @@
 
                         <tbody>
 
-
                         <tr>
                             <th>First Name</th><td>{{$result->Fname}}</td>
                         </tr>
@@ -67,17 +66,17 @@
                             <th>Mother Full Name</th><td>{{$result->MotherFullName}}</td>
                         </tr>
 
-                        <tr>
-                            <th>Mother Nationality</th><td>{{$result->MotherNationalityID}}</td>
-                        </tr>
+{{--                        <tr>--}}
+{{--                            <th>Mother Nationality</th><td>{{$result->MotherNationalityID}}</td>--}}
+{{--                        </tr>--}}
 
                         <tr>
                             <th>Father Full Name</th><td>{{$result->FatherFullName}}</td>
                         </tr>
 
-                        <tr>
-                            <th>Father Nationality</th><td>{{$result->FatherNationalityID}}</td>
-                        </tr>
+{{--                        <tr>--}}
+{{--                            <th>Father Nationality</th><td>{{$result->FatherNationalityID}}</td>--}}
+{{--                        </tr>--}}
 
                         </tbody>
 

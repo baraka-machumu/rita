@@ -93,15 +93,13 @@
 
                     @include('births.new_certificate.actions')
 
-
                 </div>
-
 
             </div>
         </div>
 
-
     </div>
 
+    @include('births.new_certificate.check_mother_children_modal')
 
 @stop

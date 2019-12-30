@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BirthRegistration;
 
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +11,10 @@ use Illuminate\Support\Facades\Session;
 
 class BirthDuplicateController extends Controller
 {
-
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     // function data handle all new birth registrations. goes here.
     public  function index($tab) {
 
@@ -50,6 +54,8 @@ class BirthDuplicateController extends Controller
 
         $tab  =  2;
 
+        Session::flash('alert-success','Task Taken');
+
         return redirect('birth-certificates/duplicate/'.$tab.'/request');
 
     }
@@ -61,6 +67,7 @@ class BirthDuplicateController extends Controller
         $verify =  true;
         $issue  =  false;
         $is_result= false;
+        $issue_search = false;
 
         $ddata =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',2)
@@ -72,7 +79,9 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('BirthDuplicate as bd','bd.DupID','sap.ApplicationID')->first();
 
-        return view('births.duplicate_certificate.view_duplicate_data',compact('is_result','verify','issue','ddata'));
+
+//        dd($ddata);
+        return view('births.duplicate_certificate.view_duplicate_data',compact('issue_search','is_result','verify','issue','ddata'));
 
     }
 
@@ -81,6 +90,8 @@ class BirthDuplicateController extends Controller
     public function serachByEntryNumber(Request $request,$trackerId){
 
         $entryNo = $request->entryNo;
+
+
 
         if (empty($entryNo)){
 
@@ -110,13 +121,19 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('BirthDuplicate as bd','bd.DupID','sap.ApplicationID')->first();
 
-        $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
+        $result=   DB::table('DataInfo as d')
+            ->where('d.EntryNo','=',$entryNo)
+            ->join('Sex','Sex.SexID','=','d.SexID')
+            ->first();
 
+//        return response()->json($result);
         $verify =  true;
         $issue  =  false;
         $is_result= true;
+        $issue_search = true;
 
-        return view('births.duplicate_certificate.view_duplicate_data',compact('is_result','verify','issue','ddata','result'));
+
+        return view('births.duplicate_certificate.view_duplicate_data',compact('issue_search','is_result','verify','issue','ddata','result'));
 
 
     }
@@ -130,7 +147,13 @@ class BirthDuplicateController extends Controller
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        return redirect('birth-certificates/duplicate/1/request');
+        $handlerId  =  Auth::user()->StaffID;
+
+        CommentController::commentSave($request,$handlerId,$trackerId,"Verify");
+
+        Session::flash('alert-success','Request Verified');
+
+        return redirect('birth-certificates/duplicate/2/request');
 
     }
 
@@ -142,7 +165,7 @@ class BirthDuplicateController extends Controller
 
         $issues =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',2)
-            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+//            ->where('sap.HandlerID','=',Auth::user()->StaffID)
             ->where('sap.ApplicationStatusID','=',3)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -190,7 +213,7 @@ class BirthDuplicateController extends Controller
 
     public  function issueSerachByEntryNumber(Request $request,$trackerId){
 
-        $entryNo = $request->entryNo;
+        $entryNo ='192005962068';// $request->entryNo;
 
         if (empty($entryNo)){
 
@@ -233,14 +256,27 @@ class BirthDuplicateController extends Controller
 
     public  function  issueStore($trackerId){
 
-
         $status =  5;
+
+        $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
+
+        $applicationId =  $servApp->ApplicationID;
+        $entryNo  =  DB::table('BirthService')->where('BirthServID',$applicationId)->first()->EntryNo;
+
+//        $entryNo = '192005962068';
+        if (!$entryNo){
+
+            Session::flash('alert-danger','The Entry Number Is Not Valid Number.');
+
+            return redirect('birth-certificates/duplicate/view-issue-request/'.$trackerId);
+        }
+
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
 
-//        return redirect('birth-certificates/duplicate/1/issue');
 
-        return redirect('birth-certificates/new-certificate/print/'.$trackerId);
+        return redirect('birth-certificates/new-certificate/print/'.$entryNo);
+
 
 
     }

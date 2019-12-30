@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BirthRegistration;
 
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,10 @@ use Illuminate\Support\Facades\Session;
 class BirthChangeRequestController extends Controller
 {
 
-
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     // function data handle all new birth registrations. goes here.
     public  function index($tab) {
 
@@ -42,11 +46,13 @@ class BirthChangeRequestController extends Controller
     // function to assign task to rita staff
     public  function  myTask($trackerId){
 
+
         $handlerId  =  Auth::user()->StaffID;
 
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
 
         $tab  =  2;
+        Session::flash('alert-success','Task Taken');
 
         return redirect('birth-certificates/replace/'.$tab.'/request');
 
@@ -55,10 +61,13 @@ class BirthChangeRequestController extends Controller
 
     public  function  viewRequest($trackerId){
 
+
         $handlerId  =  Auth::user()->StaffID;
         $verify =  true;
         $issue  =  false;
         $is_result= false;
+
+        $is_check_modal=  false;
 
         $ddata =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',7)
@@ -70,7 +79,8 @@ class BirthChangeRequestController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->first();
 
-        return view('births.replace_old_certificate.view_replace_data',compact('is_result','verify','issue','ddata'));
+//        dd(444);
+        return view('births.replace_old_certificate.view_replace_data',compact('is_check_modal','is_result','verify','issue','ddata'));
 
     }
 
@@ -111,17 +121,19 @@ class BirthChangeRequestController extends Controller
         $result=  DB::table('DataInfo as d')
             ->where('d.EntryNo','=',$entryNo)
             ->join('Sex','Sex.SexID','=','d.SexID')
-            ->join('Country as cn','cn.CountryID','=','d.ChildNationalityID')
-            ->join('Country as mn','mn.CountryID','=','d.MotherNationalityID')
-            ->join('Country as fn','fn.CountryID','=','d.FatherNationalityID')
+//            ->join('Country as cn','cn.CountryID','=','d.ChildNationalityID')
+//            ->join('Country as mn','mn.CountryID','=','d.MotherNationalityID')
+//            ->join('Country as fn','fn.CountryID','=','d.FatherNationalityID')
             ->first();
 
 //        return response()->json($result);
         $verify =  true;
         $issue  =  false;
         $is_result= true;
+        $is_check_modal=  true;
 
-        return view('births.replace_old_certificate.view_replace_data',compact('is_result','verify','issue','ddata','result'));
+
+        return view('births.replace_old_certificate.view_replace_data',compact('is_check_modal','is_result','verify','issue','ddata','result'));
 
 
     }
@@ -130,16 +142,16 @@ class BirthChangeRequestController extends Controller
 
         $comment  =  $request->comment;
 
-
         $status =  3;
 
+        $handlerId  =  Auth::user()->StaffID;
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
+
+        CommentController::commentSave($request,$handlerId,$trackerId,"Verify");
 
         return redirect('birth-certificates/replace/1/request');
 
     }
-
-
 
     //issue
 
@@ -163,6 +175,7 @@ class BirthChangeRequestController extends Controller
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+
 
         return view('births.replace_old_certificate.tab_issue',compact('tab','issues','printed'));
 
@@ -188,8 +201,10 @@ class BirthChangeRequestController extends Controller
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->first();
 
 //        return  response()->json($ddata);
+        $comments  =  CommentController::getComments($trackerId);
 
-        return view('births.replace_old_certificate.view_issue_replace_data',compact('issue_search','is_result','verify','issue','ddata'));
+
+        return view('births.replace_old_certificate.view_issue_replace_data',compact('comments','issue_search','is_result','verify','issue','ddata'));
 
     }
 
@@ -197,7 +212,8 @@ class BirthChangeRequestController extends Controller
 
     public  function issueSerachByEntryNumber(Request $request,$trackerId){
 
-        $entryNo = 888;//$request->entryNo;
+        $entryNo =  $request->entryNo;//'192005962068';//
+
 
         if (empty($entryNo)){
 
@@ -227,22 +243,49 @@ class BirthChangeRequestController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->first();
 
-        $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
+        $result=   DB::table('DataInfo as d')
+            ->where('d.EntryNo','=',$entryNo)
+            ->join('Sex','Sex.SexID','=','d.SexID')->first();
+
 
         $verify =  true;
-        $issue  =  false;
+        $issue  =  true;
         $is_result= true;
+        $issue_search  =  true;
+        $comments  =  CommentController::getComments($trackerId);
 
-        return view('births.replace_old_certificate.view_issue_replace_data',compact('is_result','verify','issue','ddata','result'));
+        return view('births.replace_old_certificate.view_issue_replace_data',compact('issue_search','comments','is_result','verify','issue','ddata','result'));
 
     }
 
-    public  function  issueStore($trackerId){
+    public  function  issueStore(Request  $request,$trackerId){
 
         $status =  5;
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        return redirect('birth-certificates/replace/1/issue');
+        $handlerId  =  Auth::user()->StaffID;
+
+        CommentController::commentSave($request,$handlerId,$trackerId,"Verify");
+
+        $type  = 2;
+
+        $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
+
+        $applicationId =  $servApp->ApplicationID;
+        $entryNo  =  DB::table('BirthService')->where('BirthServID',$applicationId)->first()->EntryNo;
+
+        if (!$entryNo){
+
+            Session::flash('alert-danger','The Entry Number Is Not In Our Records');
+
+            return redirect('birth-certificates/replace/view-issue-request/'.$trackerId);
+        }
+
+
+
+        return redirect('/reports/certificate/'.$entryNo.'/view/'.$type);
+
+
     }
 
 }

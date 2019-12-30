@@ -36,7 +36,7 @@
 
                         <td>
 
-                            <a href="{{url('birth-certificates/duplicate/my-task',$dublicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-tasks"></i></a>
+                            <a href="{{url('death-certificates/duplicate/my-task',$dublicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-tasks"></i></a>
                         </td>
 
                     </tr>

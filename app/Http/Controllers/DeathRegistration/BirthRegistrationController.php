@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\DeathRegistration;
 
 use App\Comment;
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
@@ -28,8 +29,11 @@ class BirthRegistrationController extends Controller
 
     public  function  newRequest($tab){
 
+
+        //ApplicationStatusID 4 == new registration for death.
         $newBirthRegistrations =  DB::table('ServApplicationTracker as sap')
-            ->where('HandlerID','=',null)
+            ->where('sap.HandlerID','=',null)
+            ->where('sap.ServiceTypeID','=','4')
             ->select('as.StatusCode','sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
             ->join('DeathService as ds','ds.DeathServID','sap.ApplicationID')
             ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
@@ -50,8 +54,7 @@ class BirthRegistrationController extends Controller
             ->where([
                 ['HandlerID','=',$handlerId],
                 ['sap.ApplicationStatusID','=',$statusId],
-//                ['sap.HandlerID','!=',Auth::user()->StaffID]
-
+                ['sap.ServiceTypeID','=','4']
 
             ])
             ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
@@ -88,6 +91,8 @@ class BirthRegistrationController extends Controller
                 ['sap.ApplicationStatusID','=',$statusId],
                 ['sap.ProcessingOfficeID','=',$ritaOfficeId]
             ])
+            ->where('sap.ServiceTypeID','=','4')
+
             ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
             ->join('DeathService as ds','ds.DeathServID','sap.ApplicationID')
             ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
@@ -107,6 +112,7 @@ class BirthRegistrationController extends Controller
                 ['sap.ApplicationStatusID','=',$statusId],
 
             ])
+            ->where('sap.ServiceTypeID','=','4')
             ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
             ->join('DeathService as ds','ds.DeathServID','sap.ApplicationID')
             ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
@@ -141,6 +147,8 @@ class BirthRegistrationController extends Controller
                 ['sap.ApplicationStatusID','=',$statusId],
                 ['sap.NearestRitaOfficeID','=',$ritaOfficeId]
             ])
+            ->where('sap.ServiceTypeID','=','4')
+
             ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
             ->join('DeathService as ds','ds.DeathServID','sap.ApplicationID')
             ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
@@ -165,6 +173,8 @@ class BirthRegistrationController extends Controller
                 ['sap.ApplicationStatusID','=',$statusId],
                 ['sap.NearestRitaOfficeID','=',$ritaOfficeId]
             ])
+            ->where('sap.ServiceTypeID','=','4')
+
             ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
             ->join('DeathService as ds','ds.DeathServID','sap.ApplicationID')
             ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
@@ -199,26 +209,28 @@ class BirthRegistrationController extends Controller
         $issue =  false;
 
         $childInfo =  $this->getChildInfo($trackerId);
-        $motherInfo =  $this->getMotherInfo($trackerId);
-        $fatherInfo =  $this->getFatherInfo($trackerId);
+//        $motherInfo =  $this->getMotherInfo($trackerId);
+//        $fatherInfo =  $this->getFatherInfo($trackerId);
 
         $attachments  =  DB::table('ApplAttachment as aa')
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
 
-        return view('deaths.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+//        return response()->json($childInfo);
+        return view('deaths.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','childInfo','trackerId'));
 
 
     }
 
     public  function  getChildInfo($trackerId){
 
+
         $childInfo =   DB::table('ServApplicationTracker as sap')
             ->where('TrackerID','=',$trackerId)
             ->select('c.CountryName','sex.SexName','pi.Occupation','pi.Street','pi.PhysicalAddress','pi.email','pi.IdentNo','sap.NoCopyPrinted','pi.MiddleName','pi.OtherName','pi.DOB','pi.NIN','pi.PhoneNo','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','=','sap.ApplicationID')
+            ->join('DeathService as ds','ds.DeathServID','sap.ApplicationID')
 
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
+            ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
             ->join('Country as c','c.CountryID','=','pi.CountryOfBirthID')
             ->join('Sex as sex','sex.SexID','=','pi.SexID')
 
@@ -231,185 +243,9 @@ class BirthRegistrationController extends Controller
         return $childInfo;
     }
 
-    public  function  getMotherInfo($trackerId){
-
-        $motherInfo =   DB::table('ServApplicationTracker as sap')
-            ->where('TrackerID','=',$trackerId)
-            ->select('c.CountryName','sex.SexName','pi.Occupation','pi.Street','pi.PhysicalAddress','pi.email','pi.IdentNo','sap.NoCopyPrinted','pi.MiddleName','pi.OtherName','pi.DOB','pi.NIN','pi.PhoneNo','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','=','sap.ApplicationID')
-
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.MotherID')
-            ->join('Country as c','c.CountryID','=','pi.CountryOfBirthID')
-            ->join('Sex as sex','sex.SexID','=','pi.SexID')
-
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->first();
-
-        return $motherInfo;
-    }
-
-    public  function  getFatherInfo($trackerId){
-
-        $fatherInfo =   DB::table('ServApplicationTracker as sap')
-            ->where('TrackerID','=',$trackerId)
-            ->select('c.CountryName','sex.SexName','pi.Occupation','pi.Street','pi.PhysicalAddress','pi.email','pi.IdentNo','sap.NoCopyPrinted','pi.MiddleName','pi.OtherName','pi.DOB','pi.NIN','pi.PhoneNo','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','=','sap.ApplicationID')
-
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.FatherID')
-            ->join('Country as c','c.CountryID','=','pi.CountryOfBirthID')
-            ->join('Sex as sex','sex.SexID','=','pi.SexID')
-
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->first();
-
-        return $fatherInfo;
-    }
-
-    public  function  getRegistrationDetails($tab){
-
-        $newBirthRegistrations =  DB::table('ServApplicationTracker as sap')
-            ->where('HandlerID','=',null)
-            ->select('as.StatusCode','sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->get();
-
-        $handlerId  =  Auth::user()->StaffID;
-        $statusCode  =  300;
-
-        $status  =  DB::table('ApplicationStatus')->select('StatusID')->where('StatusCode',$statusCode)->first();
-
-        $statusId  =  $status->StatusID;
-
-        $newBirthRegPendings =  DB::table('ServApplicationTracker as sap')
-            ->where([
-                ['HandlerID','=',$handlerId],
-                ['sap.ApplicationStatusID','=',$statusId],
-            ])
-            ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->get();
-
-
-        $ritaOfficeId  =  Auth::user()->RitaOfficeID;
-
-
-        $statusCode  =  301;
-
-        $status  =  DB::table('ApplicationStatus')->select('StatusID')->where('StatusCode',$statusCode)->first();
-
-        $statusId  =  $status->StatusID;
-
-
-        $newBirthRegProcessingRequests =  DB::table('ServApplicationTracker as sap')
-
-            ->where([
-
-                ['sap.ApplicationStatusID','=',$statusId],
-                ['sap.ProcessingOfficeID','=',$ritaOfficeId]
-            ])
-            ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->get();
-
-
-        $newBirthRegProcessingTasks =  DB::table('ServApplicationTracker as sap')
-
-            ->where([
-
-                ['sap.NextToActID','=',$handlerId],
-                ['sap.ProcessingOfficeID','=',$ritaOfficeId]
-            ])
-            ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->get();
-
-
-        //issuse tab
-
-        $statusCode  =  307;
-
-        $status  =  DB::table('ApplicationStatus')->select('StatusID')->where('StatusCode',$statusCode)->first();
-
-        $statusId  =  $status->StatusID;
-
-
-        $newBirthRegissues =  DB::table('ServApplicationTracker as sap')
-
-            ->where([
-
-                ['sap.ApplicationStatusID','=',$statusId],
-                ['sap.NearestRitaOfficeID','=',$ritaOfficeId]
-            ])
-            ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->get();
-
-
-
-        //printed tab
-
-        $statusCode  =  303;
-
-        $status  =  DB::table('ApplicationStatus')->select('StatusID')->where('StatusCode',$statusCode)->first();
-
-        $statusId  =  $status->StatusID;
-
-
-        $newBirthprints =  DB::table('ServApplicationTracker as sap')
-
-            ->where([
-
-                ['sap.ApplicationStatusID','=',$statusId],
-                ['sap.NearestRitaOfficeID','=',$ritaOfficeId]
-            ])
-            ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
-            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
-            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-
-            ->get();
-//        return response()->json($newBirthRegProcessingTasks);
-
-        return view('deaths.new_certificate.tab',compact('newBirthRegissues','newBirthprints','newBirthRegProcessingTasks','newBirthRegProcessingRequests','tab','newBirthRegistrations','newBirthRegPendings'));
-
-    }
 
 
     public  function  verify(Request $request, $trackerId){
-
 
         $handlerId  =  Auth::user()->StaffID;
 
@@ -424,7 +260,8 @@ class BirthRegistrationController extends Controller
 
         if ($success){
 
-            $this->commentSave($request,$handlerId,$trackerId);
+
+            CommentController::commentSave($request,$handlerId,$trackerId,"Verification");
 
             Session::flash('alert-success','Successful Verified');
 
@@ -457,19 +294,18 @@ class BirthRegistrationController extends Controller
 
     public  function  viewProcessingTask($trackerId){
 
+
         $processing =  true;
         $verify =  false;
         $issue =  false;
 
         $childInfo =  $this->getChildInfo($trackerId);
-        $motherInfo =  $this->getMotherInfo($trackerId);
-        $fatherInfo =  $this->getFatherInfo($trackerId);
 
         $attachments  =  DB::table('ApplAttachment as aa')
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
 
-        return view('deaths.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+        return view('deaths.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','childInfo','trackerId'));
 
 
     }
@@ -480,17 +316,19 @@ class BirthRegistrationController extends Controller
 
         $handlerId  =  Auth::user()->StaffID;
 
-        $statusCode  =  307;
+        $statusCode  =  307; //10
 
         $status  =  DB::table('ApplicationStatus')->select('StatusID')->where('StatusCode',$statusCode)->first();
 
-        $statusId  =  $status->StatusID;
+        $statusId  = 10;
 
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$statusId]);
 
         if ($success){
 
-            $this->commentSave($request,$handlerId,$trackerId);
+//            $this->commentSave($request,$handlerId,$trackerId);
+
+            CommentController::commentSave($request,$handlerId,$trackerId,"Approve");
 
             Session::flash('alert-success','Successful Verified');
         }
@@ -510,14 +348,12 @@ class BirthRegistrationController extends Controller
         $verify =  false;
         $issue =  true;
         $childInfo =  $this->getChildInfo($trackerId);
-        $motherInfo =  $this->getMotherInfo($trackerId);
-        $fatherInfo =  $this->getFatherInfo($trackerId);
 
         $attachments  =  DB::table('ApplAttachment as aa')
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
 
-        return view('deaths.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+        return view('deaths.new_certificate.tab_view_info',compact('verify','issue','processing','attachments','childInfo','trackerId'));
 
     }
 
@@ -525,11 +361,7 @@ class BirthRegistrationController extends Controller
 
         $handlerId  =  Auth::user()->StaffID;
 
-        $statusCode  =  303;
-
-        $status  =  DB::table('ApplicationStatus')->select('StatusID')->where('StatusCode',$statusCode)->first();
-
-        $statusId  =  $status->StatusID;
+        $statusId  =  5;
 
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$statusId]);
 
@@ -538,13 +370,24 @@ class BirthRegistrationController extends Controller
         $applicationId =  $servApp->ApplicationID;
         $servTypeId  =  4;//$servApp->ServiceTypeID;
 
-        $this->commentSave($request,$handlerId,$trackerId);
 
-        $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?',array($applicationId,$servTypeId,$handlerId));
+//        dd($entryNo);
+        CommentController::commentSave($request,$handlerId,$trackerId,"Approve");
+
+        $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?,?',array($applicationId,$servTypeId,$handlerId,4));
 
         if ($result[0]->resultCode==0){
+            $entryNo  =  DB::table('DeathService')->where('DeathServID',$applicationId)->first()->EntryNo;
 
-            Session::flash('alert-success','Successful issued');
+
+            Session::flash('alert-success','Successful issued now you can print');
+
+            $type = 4;
+
+            return redirect('/reports/certificate/'.$entryNo.'/view/'.$type);
+
+//            return redirect('death-certificates/new-certificate/print/'.$entryNo);
+
         }
 
         else {

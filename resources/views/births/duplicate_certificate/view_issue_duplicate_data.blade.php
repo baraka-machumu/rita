@@ -135,7 +135,7 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
+                        <td>{{$result->Surname}}</td>
                         <td>{{$result->DOB}}</td>
                         <td>
 

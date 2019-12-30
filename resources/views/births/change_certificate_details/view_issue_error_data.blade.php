@@ -86,11 +86,11 @@
 
             <tbody>
             <tr>
-                <th>Phone Number</th><td>{{$ddata->PhoneNo}}</td>
+                <th>Phone Number</th><td>{{$ddata->ContactPhone}}</td>
             </tr>
 
             <tr>
-                <th>Mother First Name</th><td>{{$ddata->MotherFname}}</td>
+                <th>Mother First Name</th><td>{{$ddata->MotherFName}}</td>
             </tr>
 
             <tr>
@@ -135,7 +135,7 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
+                        <td>{{$result->Surname}}</td>
                         <td>{{$result->DOB}}</td>
                         <td>
 
@@ -165,13 +165,15 @@
                     <label for="comment">Comment</label>
                     <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
 
+                    <input type="hidden" name="entryNo" value="{{$ddata->EntryNo}}">
+
                 </div>
 
                 <div class="form-group">
 
                     <button type="submit" name="send-back-result" class="btn btn-success">Issue</button>
 
-                    <a href="{{url('birth-certificates/correction/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
+                    <a href="{{url('birth-certificates/correction/return',$ddata->EntryNo)}}" class="btn btn-success">Return</a>
 
                 </div>
             </form>

@@ -40,7 +40,7 @@ class HospitalController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:2',
-            'district' => 'required|min:2',
+//            'district' => 'required|min:2',
 
         ]);
 
@@ -72,7 +72,7 @@ class HospitalController extends Controller
         }
 
 
-        return redirect('regions/create');
+        return redirect('hospitals');
 
     }
 

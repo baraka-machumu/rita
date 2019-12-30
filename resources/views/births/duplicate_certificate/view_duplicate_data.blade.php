@@ -145,11 +145,11 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
+                        <td>{{$result->Surname}}</td>
                         <td>{{$result->DOB}}</td>
                         <td>
 
-                            <a href="{{url('birth-certificates/search/view/1')}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                            <a href="#"  data-toggle="modal" data-target="#check-correct-data-duplicate-cert" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
 
                         </td>
                     </tr>
@@ -188,9 +188,17 @@
 
 
         </div>
+
+    @if(!empty($result->Fname) && !empty($result->Mname)&& !empty($result->Surname))
+        @include('births.duplicate_certificate.check_if_data_are_correct_modal')
+
+        @endif
+
     @endif
 
 
     </div>
+
+
 
 @endsection

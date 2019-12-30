@@ -189,6 +189,9 @@
 
     </div>
 
+@if($is_check_modal)
     @include('births.replace_old_certificate.check_if_data_are_correct_modal')
+
+    @endif
 
 @endsection

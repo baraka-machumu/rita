@@ -48,13 +48,13 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
-                    @include('births.change_certificate_details.index')
+                    @include('deaths.change_certificate_details.index')
 
                 </div>
                 <div class="tab-pane fade " id="profile" role="tabpanel" aria-labelledby="profile-tab">
 
 
-                    @include('births.change_certificate_details.my_task')
+                    @include('deaths.change_certificate_details.my_task')
 
                 </div>
 

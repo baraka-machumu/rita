@@ -107,6 +107,7 @@ Route::group(['prefix'=>'birth-certificates'],function (){
     Route::post('/correction/issue/search-byentry-number/{trackerId}','BirthRegistration\BirthErrorCorrectionController@issueSerachByEntryNumber');
     Route::post('/correction/issue-approve/{trackerId}','BirthRegistration\BirthErrorCorrectionController@issueStore');
 
+    Route::post('/correction/return/{trackerId}','BirthRegistration\BirthErrorCorrectionController@returnRequest');
 
     /////////////////////////////////
     Route::get('/changes','BirthRegistration\BirthChangeRequestController@index');
@@ -114,11 +115,14 @@ Route::group(['prefix'=>'birth-certificates'],function (){
     Route::get('/error-corrections','BirthRegistration\BirthErrorCorrectionController@index');
 
 
+    ////search controller
+
     Route::get('/search','Search\BirthSearchController@newBirthCertificateSearch');
 
     Route::get('/search/view/{searchId}','Search\BirthSearchController@viewBirthCertificateSearch');
-    Route::post('search/view','Search\BirthSearchController@sendBackResult');
+    Route::post('search/send-back-result','Search\BirthSearchController@sendBackResult');
     Route::post('search/exist','Search\BirthSearchController@checkExisteByEntryNumber');
+
 
     //verify
     Route::post('verify/search-byentry-number/{trackerId}','BirthRegistration\BirthVerificationController@serachByEntryNumber');
@@ -172,7 +176,7 @@ Route::group(['prefix'=>'death-certificates'],function (){
     Route::post('/duplicate/issue/search-byentry-number/{trackerId}','DeathRegistration\BirthDuplicateController@issueSerachByEntryNumber');
     Route::post('/duplicate/issue-approve/{trackerId}','DeathRegistration\BirthDuplicateController@issueStore');
 
-    //birth replace
+    //death replace
 
     Route::get('/replace/{tab}/request','DeathRegistration\BirthChangeRequestController@index');
     Route::get('/replace/my-task/{trackerId}','DeathRegistration\BirthChangeRequestController@myTask');
@@ -187,7 +191,7 @@ Route::group(['prefix'=>'death-certificates'],function (){
     Route::post('/replace/issue/search-byentry-number/{trackerId}','DeathRegistration\BirthChangeRequestController@issueSerachByEntryNumber');
     Route::post('/replace/issue-approve/{trackerId}','DeathRegistration\BirthChangeRequestController@issueStore');
 
-    //birth correction
+    //seath correction
 
     Route::get('/correction/{tab}/request','DeathRegistration\BirthErrorCorrectionController@index');
     Route::get('/correction/my-task/{trackerId}','DeathRegistration\BirthErrorCorrectionController@myTask');
@@ -201,19 +205,18 @@ Route::group(['prefix'=>'death-certificates'],function (){
     Route::get('/correction/view-issue-request/{trackerId}','DeathRegistration\BirthErrorCorrectionController@viewIssueRequest');
     Route::post('/correction/issue/search-byentry-number/{trackerId}','DeathRegistration\BirthErrorCorrectionController@issueSerachByEntryNumber');
     Route::post('/correction/issue-approve/{trackerId}','DeathRegistration\BirthErrorCorrectionController@issueStore');
-
+    Route::post('/correction/return/{trackerId}','DeathRegistration\BirthErrorCorrectionController@return');
 
     /////////////////////////////////
     Route::get('/changes','DeathRegistration\BirthChangeRequestController@index');
     Route::get('/verifications','DeathRegistration\BirthVerificationController@index');
     Route::get('/error-corrections','DeathRegistration\BirthErrorCorrectionController@index');
 
+    Route::get('/search','Search\DeathSearchController@newBirthCertificateSearch');
 
-    Route::get('/search','Search\BirthSearchController@newBirthCertificateSearch');
-
-    Route::get('/search/view/{searchId}','Search\BirthSearchController@viewBirthCertificateSearch');
-    Route::post('search/view','Search\BirthSearchController@sendBackResult');
-    Route::post('search/exist','Search\BirthSearchController@checkExisteByEntryNumber');
+    Route::get('/search/view/{searchId}','Search\DeathSearchController@viewBirthCertificateSearch');
+    Route::post('search/send-back-result','Search\DeathSearchController@sendBackResult');
+    Route::post('search/exist','Search\DeathSearchController@checkExisteByEntryNumber');
 
     //verify
     Route::post('verify/search-byentry-number/{trackerId}','DeathRegistration\BirthVerificationController@serachByEntryNumber');
@@ -324,3 +327,25 @@ Route::get('/home', 'HomeController@index')->name('home');
 //search
 
 Route::get('/advanced-search', 'Search\AdvancedSearch@advancedSearch');
+
+
+
+Route::group(['prefix'=>'reports'],function (){
+
+
+    ///cert-type  1---new birth, 2---replace, 3..
+    Route::get('/certificate/{trackerId}/view/{type}','Report\PrintController@certificate');
+    Route::get('/replace-certificate/print/{entryNo}','Report\PrintController@print');
+    Route::get('/duplicate-certificate/print/{entryNo}','Report\PrintController@print');
+
+    Route::get('/birth-correction-certificate/print/{entryNo}','Report\PrintController@print');
+
+
+    //Death cert
+    Route::get('/new-death-certificate/print/{entryNo}','Report\PrintController@deathPrint');
+//    Route::get('/new-death-certificate/{entryNo}/view/{type}','Report\PrintController@deathCertificte');
+
+
+});
+
+Route::get('certificatex/{tr}/view/{cert-type}','Report\PrintController@certificate');

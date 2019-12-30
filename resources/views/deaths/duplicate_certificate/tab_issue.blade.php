@@ -48,13 +48,13 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
-                    @include('births.duplicate_certificate.issue')
+                    @include('deaths.duplicate_certificate.issue')
 
                 </div>
                 <div class="tab-pane fade " id="profile" role="tabpanel" aria-labelledby="profile-tab">
 
 
-                    @include('births.duplicate_certificate.printed')
+                    @include('deaths.duplicate_certificate.printed')
 
                 </div>
 

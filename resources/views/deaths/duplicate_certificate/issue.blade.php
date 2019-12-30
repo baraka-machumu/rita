@@ -27,7 +27,7 @@
                 <tr>
                     <td>{{$index+1}}</td>
 
-                    <td>{{$myTaskDuplicate->ChildFname.' '.$myTaskDuplicate->ChildMname.' '.$myTaskDuplicate->ChildSurname}}</td>
+                    <td>{{$myTaskDuplicate->Fname.' '.$myTaskDuplicate->Mname.' '.$myTaskDuplicate->Surname}}</td>
                     <td>{{$myTaskDuplicate->OfficeName}}</td>
                     <td>{{$myTaskDuplicate->ServTypeName}}</td>
                     <td>{{$myTaskDuplicate->StatusName}}</td>
@@ -35,7 +35,7 @@
 
                     <td>
 
-                        <a href="{{url('birth-certificates/duplicate/view-issue-request',$myTaskDuplicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                        <a href="{{url('death-certificates/duplicate/view-issue-request',$myTaskDuplicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
 
                     </td>
 

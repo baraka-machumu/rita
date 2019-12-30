@@ -18,22 +18,22 @@ class BirthVerificationController extends Controller
     public  function index($tab) {
 
         $verifications=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',6)
+            ->where('sap.ServiceTypeID','=',11)
             ->where('sap.HandlerID','=',null)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('BirthVerification as bv','bv.VerificationID','sap.ApplicationID')->get();
+            ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
 
         $myTaskverifications=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',6)
+            ->where('sap.ServiceTypeID','=',11)
             ->where('sap.ApplicationStatusID','=',1)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('BirthVerification as bv','bv.VerificationID','sap.ApplicationID')->get();
+            ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
 
 //        return response()->json($verifications);
-        return view('births.verify_certificate.tab_verify',compact('tab','myTaskverifications','verifications'));
+        return view('deaths.verify_certificate.tab_verify',compact('tab','myTaskverifications','verifications'));
 
     }
 
@@ -46,7 +46,7 @@ class BirthVerificationController extends Controller
 
         $tab  =  2;
 
-        return redirect('birth-certificates/'.$tab.'/verify');
+        return redirect('death-certificates/'.$tab.'/verify');
 
     }
 
@@ -60,16 +60,16 @@ class BirthVerificationController extends Controller
         //vdata means verification data
 
         $vdata=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',6)
+            ->where('sap.ServiceTypeID','=',11)
             ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('BirthVerification as bv','bv.VerificationID','sap.ApplicationID')->first();
+            ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->first();
 
 //                return response()->json($vdata);
 
-        return view('births.verify_certificate.view_verify_data',compact('vdata','is_result'));
+        return view('deaths.verify_certificate.view_verify_data',compact('vdata','is_result'));
 
     }
 
@@ -97,19 +97,19 @@ class BirthVerificationController extends Controller
         $handlerId  =  Auth::user()->StaffID;
 
         $vdata=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',6)
+            ->where('sap.ServiceTypeID','=',11)
             ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('BirthVerification as bv','bv.VerificationID','sap.ApplicationID')->first();
+            ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->first();
 
         $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
 
         $is_result =  true;
 
 
-        return view('births.verify_certificate.view_verify_data',compact('vdata','result','is_result'));
+        return view('deaths.verify_certificate.view_verify_data',compact('vdata','result','is_result'));
 
 
     }
@@ -120,13 +120,13 @@ class BirthVerificationController extends Controller
         $searchId =  $request->verificationId;
         $comment  =  $request->comment;
 
-        DB::table('BirthVerification')->where('verificationId',$searchId)->update(['Comment'=>$comment]);
+        DB::table('DeathVerification')->where('DeathVerID',$searchId)->update(['Comment'=>$comment]);
 
         $status =  8;
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        return redirect('birth-certificates/1/verify');
+        return redirect('death-certificates/1/verify');
 
     }
 

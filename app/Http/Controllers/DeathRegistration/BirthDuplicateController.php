@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\DeathRegistration;
 
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use function Couchbase\defaultDecoder;
 
 class BirthDuplicateController extends Controller
 {
@@ -15,7 +17,7 @@ class BirthDuplicateController extends Controller
     public  function index($tab) {
 
         $dublicates =     DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
+            ->where('sap.ServiceTypeID','=',8)
             ->where('sap.HandlerID','=',null)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -24,13 +26,14 @@ class BirthDuplicateController extends Controller
             ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
 
         $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
+            ->where('sap.ServiceTypeID','=',8)
             ->where('sap.ApplicationStatusID','=',1)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+
 
         return view('deaths.duplicate_certificate.tab_duplicate',compact('tab','dublicates','myTaskDuplicates'));
 
@@ -57,18 +60,21 @@ class BirthDuplicateController extends Controller
         $verify =  true;
         $issue  =  false;
         $is_result= false;
+        $issue_search =  false;
+        $is_check_modal=  false;
 
         $ddata =     DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
+            ->where('sap.ServiceTypeID','=',8)
             ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->first();
 
-        return view('deaths.duplicate_certificate.view_duplicate_data',compact('is_result','verify','issue','ddata'));
+
+        return view('deaths.duplicate_certificate.view_duplicate_data',compact('is_check_modal','issue_search','is_result','verify','issue','ddata'));
 
     }
 
@@ -96,31 +102,39 @@ class BirthDuplicateController extends Controller
 
         $handlerId  =  Auth::user()->StaffID;
 
+
         $ddata =     DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
+            ->where('sap.ServiceTypeID','=',8)
             ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->first();
 
-        $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
+        $result=  DB::table('DataInfo as di')
+            ->where('di.DeathEntryNo','=',$entryNo)
+//                      ->join('DeathService as ds','ds.DeathServID','=','di.PersonalID')
+//            ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
+
+            ->first();
+
+//        return response()->json($result);
 
         $verify =  true;
         $issue  =  false;
         $is_result= true;
+        $issue_search =  false;
+        $is_check_modal=  true;
 
-        return view('deaths.duplicate_certificate.view_duplicate_data',compact('is_result','verify','issue','ddata','result'));
+
+        return view('deaths.duplicate_certificate.view_duplicate_data',compact('is_check_modal','issue_search','is_result','verify','issue','ddata','result'));
 
 
     }
 
     public  function  verify(Request $request,$trackerId){
-
-        $comment  =  $request->comment;
-
 
         $status =  3;
 
@@ -135,8 +149,8 @@ class BirthDuplicateController extends Controller
     public  function issueRequest($tab) {
 
         $issues =     DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
-            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+            ->where('sap.ServiceTypeID','=',8)
+//            ->where('sap.HandlerID','=',Auth::user()->StaffID)
             ->where('sap.ApplicationStatusID','=',3)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -145,7 +159,7 @@ class BirthDuplicateController extends Controller
             ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
 
         $printed=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
+            ->where('sap.ServiceTypeID','=',8)
             ->where('sap.ApplicationStatusID','=',5)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -167,15 +181,16 @@ class BirthDuplicateController extends Controller
         $issue_search  =  true;
 
         $ddata =     DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
+            ->where('sap.ServiceTypeID','=',8)
             ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->first();
 
+//        return response()->json($ddata);
         return view('deaths.duplicate_certificate.view_issue_duplicate_data',compact('issue_search','is_result','verify','issue','ddata'));
 
     }
@@ -203,31 +218,41 @@ class BirthDuplicateController extends Controller
         $handlerId  =  Auth::user()->StaffID;
 
         $ddata =     DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',2)
+            ->where('sap.ServiceTypeID','=',8)
             ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->first();
 
-        $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
+        $result=  DB::table('DataInfo')->where('DeathEntryNo','=',$entryNo)->first();
 
         $verify =  true;
         $issue  =  false;
         $is_result= true;
+//        $issue_search =  false;
 
         return view('deaths.duplicate_certificate.view_issue_duplicate_data',compact('is_result','verify','issue','ddata','result'));
 
     }
 
-    public  function  issueStore($trackerId){
+    public  function  issueStore(Request $request,$trackerId){
 
         $status =  5;
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        return redirect('death-certificates/duplicate/1/issue');
+        $handlerId  =  Auth::user()->StaffID;
+
+        $type = 4; // death duplicate certificate.
+
+        $entryNo  =  $request->entryNo;
+
+
+        CommentController::commentSave($request,$handlerId,$trackerId,"Issue and print");
+
+        return redirect('/reports/certificate/'.$entryNo.'/view/'.$type);
 
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BirthRegistration;
 
 use App\Comment;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class BirthRegistrationController extends Controller
 
         $newBirthRegistrations =  DB::table('ServApplicationTracker as sap')
             ->where('HandlerID','=',null)
-            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.NearestRitaOfficeID',Auth::user()->RitaOfficeID)
             ->select('as.StatusCode','sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
             ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
             ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
@@ -122,6 +123,7 @@ class BirthRegistrationController extends Controller
     //issue
     public  function  newIssue($tab){
 
+
         //issuse tab
 
         $statusCode  =  307;
@@ -183,6 +185,8 @@ class BirthRegistrationController extends Controller
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
 
         $tab  =  2;
+        Session::flash('alert-success','Task Taken');
+
         return redirect('birth-certificates/'.$tab.'/new-request');
 
     }
@@ -195,16 +199,21 @@ class BirthRegistrationController extends Controller
         $verify =  true;
         $issue =  false;
 
+
         $childInfo =  $this->getChildInfo($trackerId);
         $motherInfo =  $this->getMotherInfo($trackerId);
         $fatherInfo =  $this->getFatherInfo($trackerId);
 
+//        return response()->json($motherInfo);
         $attachments  =  DB::table('ApplAttachment as aa')
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
 
         $comments  =  $this->getComments($trackerId);
-        return view('births.new_certificate.tab_view_info',compact('comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+
+        $childrenByMotherName =  HelperController::getMotherChildren($motherInfo->FirstName,$motherInfo->SurName,$childInfo->DOB);
+
+        return view('births.new_certificate.tab_view_info',compact('childrenByMotherName','comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
 
 
     }
@@ -449,6 +458,8 @@ class BirthRegistrationController extends Controller
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['NextToActID'=>$nextToActId]);
 
         $tab  =  2;
+        Session::flash('alert-success','Task Taken');
+
 
         return redirect('birth-certificates/'.$tab.'/new-processing');
 
@@ -470,7 +481,9 @@ class BirthRegistrationController extends Controller
 //        dd($trackerId);
         $comments  =  $this->getComments($trackerId);
 
-        return view('births.new_certificate.tab_view_info',compact('comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+        $childrenByMotherName =  HelperController::getMotherChildren($motherInfo->FirstName,$motherInfo->SurName,$childInfo->DOB);
+
+        return view('births.new_certificate.tab_view_info',compact('childrenByMotherName','comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
 
 
     }
@@ -493,12 +506,12 @@ class BirthRegistrationController extends Controller
 
             $this->commentSave($request,$handlerId,$trackerId,"Approve");
 
-            Session::flash('alert-success','Successful Verified');
+            Session::flash('alert-success','Successful Approved');
         }
 
         else {
 
-            Session::flash('alert-danger', 'Failed to Verify');
+            Session::flash('alert-danger', 'Failed to Approve');
 
         }
 
@@ -519,7 +532,14 @@ class BirthRegistrationController extends Controller
             ->where('ApplicationID',$trackerId)->get();
 
         $comments  =  $this->getComments($trackerId);
-        return view('births.new_certificate.tab_view_info',compact('comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
+
+//        return response()->json($childInfo);
+
+        $childrenByMotherName =  HelperController::getMotherChildren($motherInfo->FirstName,$motherInfo->SurName,$childInfo->DOB);
+
+//        return response()->json($childrenByMotherName);
+
+        return view('births.new_certificate.tab_view_info',compact('childrenByMotherName','comments','verify','issue','processing','attachments','fatherInfo','childInfo','motherInfo','trackerId'));
 
     }
 
@@ -590,7 +610,7 @@ class BirthRegistrationController extends Controller
 
         $inputControls   = [
 
-            ['EntryNo'=>$entryNo]
+            'EntryNo'=>$entryNo
         ];
 
         $getReport  =  $server->reportService()->runReport($report_url,'pdf',null,null,$inputControls);

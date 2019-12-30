@@ -45,17 +45,17 @@
             <tbody>
 
             <tr>
-                <th>First Name</th><td>{{$vdata->ChildFname}}</td>
+                <th>First Name</th><td>{{$vdata->Fname}}</td>
             </tr>
             <tr>
-                <th>Middle Name</th><td>{{$vdata->ChildMname}}</td>
+                <th>Middle Name</th><td>{{$vdata->Mname}}</td>
             </tr>
             <tr>
-                <th>Last Name</th><td>{{$vdata->ChildLname}}</td>
+                <th>Last Name</th><td>{{$vdata->Surname}}</td>
             </tr>
 
             <tr>
-                <th>Date Of Birth</th><td>{{$vdata->DOB}}</td>
+                <th>Date Of Birth</th><td>{{$vdata->DOD}}</td>
             </tr>
 
             <tr>
@@ -69,7 +69,7 @@
 
             {{csrf_field()}}
 
-            <input type="hidden" value="{{$vdata->EntryNo}}" name="entryNo">
+            <input type="hidden" value="{{$vdata->DeathEntryNo}}" name="entryNo">
 
             <button type="submit" class="btn btn-primary">Search</button>
 
@@ -87,24 +87,18 @@
 
             <tbody>
             <tr>
-                <th>Phone Number</th><td>{{$vdata->PhoneNo}}</td>
-            </tr>
-
-            <tr>
-                <th>Mother First Name</th><td>{{$vdata->MotherFname}}</td>
+                <th>Phone Number</th><td>{{$vdata->InformantPhone}}</td>
             </tr>
 
 
             <tr>
-                <th>Mother  SurName</th><td>{{$vdata->MotherSurname}}</td>
+                <th>Email</th><td>{{$vdata->InformantEmail}}</td>
             </tr>
+
 
             <tr>
-                <th>Entry Number </th><td>{{$vdata->EntryNo}}</td>
+                <th>Entry Number</th><td>{{$vdata->DeathEntryNo}}</td>
             </tr>
-
-
-
             </tbody>
 
 

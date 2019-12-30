@@ -51,7 +51,7 @@
                 </tr>
 
                 <tr>
-                    <th>Phone Number</th><td>{{$cdata->EntryNo}}</td>
+                    <th>Entry Number</th><td>{{$cdata->EntryNo}}</td>
                 </tr>
 
                 </tbody>
@@ -158,7 +158,7 @@
                 </table>
 
 
-                <form action="{{url('birth-certificates/search/view')}}"  method="post">
+                <form action="{{url('birth-certificates/search/send-back-result')}}"  method="post">
 
                     {{csrf_field()}}
                     <div class="form-group">

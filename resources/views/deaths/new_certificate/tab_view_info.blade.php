@@ -29,22 +29,6 @@
 
 
                 <li class="nav-item">
-                    <a class="nav-link" id="mother-tab" data-toggle="tab" href="#mother" role="tab" aria-controls="mother" aria-selected="false">
-
-                        Mother Info
-
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" id="father-tab" data-toggle="tab" href="#father" role="tab" aria-controls="father" aria-selected="false">
-
-                        Father Info
-
-                    </a>
-                </li>
-
-                <li class="nav-item">
                     <a class="nav-link" id="attachments-tab" data-toggle="tab" href="#attachments" role="tab" aria-controls="attachments" aria-selected="false">
 
                     Attachments
@@ -71,17 +55,7 @@
                     @include('deaths.new_certificate.child_info')
 
                 </div>
-                <div class="tab-pane fade " id="mother" role="tabpanel" aria-labelledby="mother-tab">
 
-                    @include('deaths.new_certificate.mother_info')
-
-                </div>
-
-                <div class="tab-pane fade" id="father" role="tabpanel" aria-labelledby="father-tab">
-                    @include('deaths.new_certificate.father_info')
-
-
-                </div>
                 <div class="tab-pane fade" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
 
                     @include('deaths.new_certificate.attchments_info')

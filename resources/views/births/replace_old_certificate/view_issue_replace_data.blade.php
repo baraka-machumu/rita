@@ -4,7 +4,7 @@
 
 @section('heading-title')
 
-    <h2>Informant Details</h2>
+    <h2>Replace Old Certificate For  <b style="font-style: italic">{{$ddata->ChildFname.' '.$ddata->ChildMname.' '.$ddata->ChildSurname}}</b></h2>
 
 @endsection
 @section('content')
@@ -105,6 +105,53 @@
 
         </table>
 
+
+{{--        <div class="col-md-6">--}}
+
+
+            <table class="table table-striped">
+
+                <tbody>
+
+                <tr style="background-color: #0E6BB7; color: white;">
+                    <td colspan="12">Comments</td>
+                </tr>
+
+                </tbody>
+            </table>
+
+            <div>
+
+                @foreach($comments as $comment)
+
+                    <ul class="list-unstyled timeline">
+                        <li>
+                            <div class="block">
+                                <div class="tags">
+                                    <a href="" class="tag">
+                                        <span>{{$comment->CommentType}}</span>
+                                    </a>
+                                </div>
+                                <div class="block_content">
+                                    <h2 class="title">
+                                        <a>{{$comment->Comment}}</a>
+                                    </h2>
+                                    <div class="byline">
+                                        <span>{{$comment->Date}}</span> by <a>{{$comment->Username}}</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                        </li>
+                    </ul>
+
+                @endforeach
+            </div>
+
+{{--        </div>--}}
+
     </div>
     @if($is_result)
         <div class="col-md-12">
@@ -135,11 +182,11 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
-                        <td>{{$result->DoB}}</td>
+                        <td>{{$result->Surname}}</td>
+                        <td>{{$result->DOB}}</td>
                         <td>
 
-                            <a href="{{url('birth-certificates/replace/view/1')}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                            <a href="#" data-toggle="modal" data-target="#check-correct-data-replace-cert" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
 
                         </td>
                     </tr>
@@ -169,7 +216,8 @@
 
                 <div class="form-group">
 
-                    <button type="submit" name="send-back-result" class="btn btn-success">Issue</button>
+
+                    <button type="submit" name="send-back-result" class="btn btn-success">Issue and Print</button>
 
                     <a href="{{url('birth-certificates/replace/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
 
@@ -183,4 +231,5 @@
 
     </div>
 
+{{--    @include('births.replace_old_certificate.check_if_data_are_correct_modal')--}}
 @endsection

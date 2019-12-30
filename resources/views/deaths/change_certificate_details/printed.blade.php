@@ -27,7 +27,7 @@
                 <tr>
                     <td>{{$index+1}}</td>
 
-                    <td>{{$myTaskDuplicate->ChildFname.' '.$myTaskDuplicate->ChildMname.' '.$myTaskDuplicate->ChildSurname}}</td>
+                    <td>{{$myTaskDuplicate->Fname.' '.$myTaskDuplicate->Mname.' '.$myTaskDuplicate->Surname}}</td>
                     <td>{{$myTaskDuplicate->OfficeName}}</td>
                     <td>{{$myTaskDuplicate->ServTypeName}}</td>
                     <td>{{$myTaskDuplicate->StatusName}}</td>

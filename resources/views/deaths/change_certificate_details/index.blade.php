@@ -28,7 +28,7 @@
                     <tr>
                         <td>{{$index+1}}</td>
 
-                        <td>{{$dublicate->ChildFname.' '.$dublicate->ChildMname.' '.$dublicate->ChildSurname}}</td>
+                        <td>{{$dublicate->Fname.' '.$dublicate->Mname.' '.$dublicate->Surname}}</td>
                         <td>{{$dublicate->OfficeName}}</td>
                         <td>{{$dublicate->ServTypeName}}</td>
                         <td>{{$dublicate->StatusName}}</td>
@@ -36,7 +36,7 @@
 
                         <td>
 
-                            <a href="{{url('birth-certificates/correction/my-task',$dublicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-tasks"></i></a>
+                            <a href="{{url('death-certificates/correction/my-task',$dublicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-tasks"></i></a>
                         </td>
 
                     </tr>

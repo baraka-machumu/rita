@@ -35,7 +35,7 @@
 
                     <td>
 
-                        <a href="{{url('birth-certificates/duplicate/view-request',$myTaskDuplicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                        <a href="{{url('death-certificates/duplicate/view-request',$myTaskDuplicate->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
 
                     </td>
 

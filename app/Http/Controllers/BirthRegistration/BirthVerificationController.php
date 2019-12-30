@@ -50,6 +50,8 @@ class BirthVerificationController extends Controller
 
         $tab  =  2;
 
+        Session::flash('alert-success','Task Taken');
+
         return redirect('birth-certificates/'.$tab.'/verify');
 
     }
@@ -80,7 +82,7 @@ class BirthVerificationController extends Controller
 
     public function serachByEntryNumber(Request $request,$trackerId){
 
-        $entryNo =$request->entryNo;
+        $entryNo =$request->entryNo; //'192005962068';
 
         if (empty($entryNo)){
 
@@ -115,7 +117,6 @@ class BirthVerificationController extends Controller
 
         return view('births.verify_certificate.view_verify_data',compact('vdata','result','is_result'));
 
-
     }
 
     public  function  response(Request $request){
@@ -130,7 +131,9 @@ class BirthVerificationController extends Controller
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        return redirect('birth-certificates/1/verify');
+        Session::flash('alert-success','Verfied');
+
+        return redirect('birth-certificates/2/verify');
 
     }
 

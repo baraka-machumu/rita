@@ -45,17 +45,17 @@
             <tbody>
 
             <tr>
-                <th>First Name</th><td>{{$ddata->ChildFname}}</td>
+                <th>First Name</th><td>{{$ddata->Fname}}</td>
             </tr>
             <tr>
-                <th>Middle Name</th><td>{{$ddata->ChildMname}}</td>
+                <th>Middle Name</th><td>{{$ddata->Mname}}</td>
             </tr>
             <tr>
-                <th>Last Name</th><td>{{$ddata->ChildSurname}}</td>
+                <th>Last Name</th><td>{{$ddata->Surname}}</td>
             </tr>
 
             <tr>
-                <th>Date Of Birth</th><td>{{$ddata->DOB}}</td>
+                <th>Date Of Birth</th><td>{{$ddata->DOD}}</td>
             </tr>
 
             <tr>
@@ -65,11 +65,11 @@
 
         </table>
 
-        <form method="post" action="{{url('birth-certificates/duplicate/issue/search-byentry-number',$ddata->TrackerID)}}">
+        <form method="post" action="{{url('death-certificates/duplicate/issue/search-byentry-number',$ddata->TrackerID)}}">
 
             {{csrf_field()}}
 
-            <input type="hidden" value="{{$ddata->EntryNo}}" name="entryNo">
+            <input type="hidden" value="{{$ddata->DeathEntryNo}}" name="entryNo">
 
             <button type="submit" class="btn btn-primary">Search</button>
 
@@ -86,20 +86,9 @@
 
             <tbody>
             <tr>
-                <th>Phone Number</th><td>{{$ddata->PhoneNo}}</td>
+{{--                <th>Phone Number</th><td>{{$ddata->PhoneNo}}</td>--}}
             </tr>
 
-            <tr>
-                <th>Mother First Name</th><td>{{$ddata->MotherFname}}</td>
-            </tr>
-
-            <tr>
-                <th>Mother  SurName</th><td>{{$ddata->MotherSurname}}</td>
-            </tr>
-
-            <tr>
-                <th>Entry Number </th><td>{{$ddata->EntryNo}}</td>
-            </tr>
 
             </tbody>
 
@@ -135,7 +124,7 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
+                        <td>{{$result->Surname}}</td>
                         <td>{{$result->DOB}}</td>
                         <td>
 
@@ -156,22 +145,23 @@
             </table>
 
 
-            <form action="{{url('birth-certificates/duplicate/issue-approve',$ddata->TrackerID)}}"  method="post">
+            <form action="{{url('death-certificates/duplicate/issue-approve',$ddata->TrackerID)}}"  method="post">
 
                 {{csrf_field()}}
 
                 <div class="form-group">
 
-                    <label for="comment">Comment</label>
-                    <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
+                    <label for="comment">Commentd</label>
+                    <textarea class="form-control" rows="2" name="comment" id="comment" required></textarea>
+                    <input type="hidden" value="{{$ddata->DeathEntryNo}}" name="entryNo">
 
                 </div>
 
                 <div class="form-group">
 
-                    <button type="submit" name="send-back-result" class="btn btn-success">Issue</button>
+                    <button type="submit" name="send-back-result" class="btn btn-success">Issue and Print</button>
 
-                    <a href="{{url('birth-certificates/duplicate/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
+                    <a href="{{url('death-certificates/duplicate/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
 
                 </div>
             </form>

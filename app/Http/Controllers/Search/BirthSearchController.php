@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Search;
 
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class BirthSearchController extends Controller
 {
@@ -89,10 +91,16 @@ class BirthSearchController extends Controller
          $searchId =  $request->searchId;
          $comment  =  $request->comment;
 
+         $handlerId  =  Auth::user()->StaffID;
+
          DB::table('BirthSearch')->where('SearchID',$searchId)->update(['Comment'=>$comment]);
 
          $status =  8;
          DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
+
+         CommentController::commentSave($request,$handlerId,$trackerId,"Searching");
+
+         Session::flash('alert-success',' Feedback Sent..');
 
          return redirect('birth-certificates/search');
 

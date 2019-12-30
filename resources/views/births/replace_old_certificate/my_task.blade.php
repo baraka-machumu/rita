@@ -2,6 +2,7 @@
 <div class="row" style="margin-top: 20px;">
 
     <div class="col-md-12">
+        @include('partials.flash_error')
 
         <table class="table table-bordered table-striped table-search" id="datatable">
 

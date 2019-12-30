@@ -28,7 +28,7 @@
                     <tr>
                         <td>{{$index+1}}</td>
 
-                        <td>{{$verification->ChildFname.' '.$verification->ChildMname.' '.$verification->ChildLname}}</td>
+                        <td>{{$verification->Fname.' '.$verification->Mname.' '.$verification->Surname}}</td>
                         <td>{{$verification->OfficeName}}</td>
                         <td>Verification Service</td>
                         <td>{{$verification->StatusName}}</td>
@@ -36,7 +36,7 @@
 
                         <td>
 
-                            <a href="{{url('birth-certificates/verify/my-task',$verification->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-tasks"></i></a>
+                            <a href="{{url('death-certificates/verify/my-task',$verification->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-tasks"></i></a>
                         </td>
 
                     </tr>

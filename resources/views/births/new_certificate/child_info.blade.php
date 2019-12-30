@@ -60,7 +60,9 @@
             </tbody>
 
         </table>
-        <a href="{{url()->previous()}}" class="btn btn-info">Back</a>
+
+        <a href="{{url()->previous()}}" class="btn btn-primary">Back</a>
+        <button class="btn btn-info" data-toggle="modal" data-target="#check-mother-children">Show Related Children</button>
 
 
     </div>

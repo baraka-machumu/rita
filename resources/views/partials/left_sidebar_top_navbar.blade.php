@@ -102,19 +102,19 @@
                                         </li>
 
                                     </ul>
-                                <li><a >Replace Old  Certificate<span class="fa fa-chevron-down"></span></a>
+{{--                                <li><a >Replace Old  Certificate<span class="fa fa-chevron-down"></span></a>--}}
 
-                                    <ul class="nav child_menu">
+{{--                                    <ul class="nav child_menu">--}}
 
-                                        <li><a href="{{url('death-certificates/replace/1/request')}}">Requests</a>
-                                        </li>
+{{--                                        <li><a href="{{url('death-certificates/replace/1/request')}}">Requests</a>--}}
+{{--                                        </li>--}}
 
-                                        <li><a href="{{url('death-certificates/replace/1/issue')}}">Issue</a>
-                                        </li>
+{{--                                        <li><a href="{{url('death-certificates/replace/1/issue')}}">Issue</a>--}}
+{{--                                        </li>--}}
 
-                                    </ul>
+{{--                                    </ul>--}}
 
-                                </li>
+{{--                                </li>--}}
 
 
                                 <li><a>Duplicate  Certificate<span class="fa fa-chevron-down"></span></a>
