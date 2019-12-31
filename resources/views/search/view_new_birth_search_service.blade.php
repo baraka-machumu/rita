@@ -59,7 +59,7 @@
             </table>
 
 
-            <form action="{{url('birth-certificates/search/exist')}}" method="post">
+            <form action="{{url('birth-certificates/search/exist',$cdata->TrackerID)}}" method="post">
 
                 {{csrf_field()}}
 

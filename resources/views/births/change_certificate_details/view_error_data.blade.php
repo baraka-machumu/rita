@@ -4,7 +4,7 @@
 
 @section('heading-title')
 
-    <h2>Informant Details</h2>
+    <h2>Informant Details </h2>
 
 
 @endsection
@@ -251,7 +251,6 @@
                 <div class="form-group">
 
 {{--                    <button type="submit" id="send-back-result-verify" name="send-back-result" class="btn btn-success">Verify</button>--}}
-
 
                         <button  type="submit" class="btn btn-success">Return</button>
 

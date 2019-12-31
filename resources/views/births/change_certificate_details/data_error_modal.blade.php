@@ -15,9 +15,12 @@
                 <form action="{{url('birth-certificates/correction/verify',$ddata->TrackerID)}}" id="form-send-back-result-verify"  method="post">
                     {{csrf_field()}}
 
-                    <input type="hidden" name="correctionFlag" value="100">
                     <input type="hidden" name="applicationId" value="{{$ddata->ApplicationID}}">
                     <input type="hidden" name="frontUserId" value="{{$ddata->FrontUserID}}">
+
+                    <input type="hidden" name="changedeCode" value="{{$ddata->ChangedCode}}">
+
+
 
                     <div class="col-md-12">
 
@@ -56,13 +59,10 @@
                             </div>
                         </div>
 
-
-
-
                         <div class="form-group row">
                             <label for="mfirstName" class="col-sm-4 col-form-label">Mother First Name</label>
                             <div class="col-sm-8">
-                                <input type="text" name="mFirstName" class="form-control" id="mfirstName" value="{{$ddata->DOB}}">
+                                <input type="text" name="mFirstName" class="form-control" id="mfirstName" value="{{$ddata->MotherFName}}">
                             </div>
                         </div>
 
@@ -70,7 +70,7 @@
                         <div class="form-group row">
                             <label for="mMiddleName" class="col-sm-4 col-form-label">Mother Middle Name</label>
                             <div class="col-sm-8">
-                                <input type="text" name="mMiddleName" class="form-control" id="mMiddleName" value="{{$ddata->DOB}}">
+                                <input type="text" name="mMiddleName" class="form-control" id="mMiddleName" value="{{$ddata->MotherMname}}">
                             </div>
                         </div>
 
@@ -89,21 +89,21 @@
                         <div class="form-group row">
                             <label for="mLastName" class="col-sm-4 col-form-label">Mother Last Name</label>
                             <div class="col-sm-8">
-                                <input type="text" name="mLastName" class="form-control" id="mLastName" value="{{$ddata->ChildFname}}">
+                                <input type="text" name="mLastName" class="form-control" id="mLastName" value="{{$ddata->MotherSurname}}">
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <label for="mcountryBirth" class="col-sm-4 col-form-label">Mother Country Of Birth </label>
                             <div class="col-sm-8">
-                                <input type="text" name="mcountryBirth" class="form-control" id="mcountryBirth" value="{{$ddata->DOB}}">
+                                <input type="text" name="mcountryBirth" class="form-control" id="mcountryBirth" value="{{$ddata->MotherNationality}}">
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <label for="ffirstName" class="col-sm-4 col-form-label">Father First Name</label>
                             <div class="col-sm-8">
-                                <input type="text" name="ffirstName" class="form-control" id="ffirstName" value="{{$ddata->ChildMname}}">
+                                <input type="text" name="ffirstName" class="form-control" id="ffirstName" value="{{$ddata->FatherFname}}">
                             </div>
                         </div>
 
@@ -111,14 +111,14 @@
                         <div class="form-group row">
                             <label for="fMiddleName" class="col-sm-4 col-form-label">Father Middle Name</label>
                             <div class="col-sm-8">
-                                <input type="text" name="fMiddleName" class="form-control" id="fMiddleName" value="{{$ddata->ChildSurname}}">
+                                <input type="text" name="fMiddleName" class="form-control" id="fMiddleName" value="{{$ddata->FatherMname}}">
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <label for="fLastName" class="col-sm-4 col-form-label">Father Last Name</label>
                             <div class="col-sm-8">
-                                <input type="text" name="fLastName" class="form-control" id="fLastName" value="{{$ddata->ChildSurname}}">
+                                <input type="text" name="fLastName" class="form-control" id="fLastName" value="{{$ddata->FatherSurname}}">
                             </div>
                         </div>
 
@@ -126,7 +126,7 @@
                         <div class="form-group row">
                             <label for="fcountryBirth" class="col-sm-4 col-form-label">Father Country Of Birth </label>
                             <div class="col-sm-8">
-                                <input type="text" name="fcountryBirth" class="form-control" id="fcountryBirth" value="{{$ddata->DOB}}">
+                                <input type="text" name="fcountryBirth" class="form-control" id="fcountryBirth" value="{{$ddata->FatherNationality}}">
                             </div>
                         </div>
 

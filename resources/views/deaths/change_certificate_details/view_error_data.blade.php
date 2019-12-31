@@ -191,6 +191,7 @@
 
             <form method="post" action="{{url('death-certificates/correction/return',$ddata->TrackerID)}}">
 
+                {{csrf_field()}}
 
                 <div class="form-group">
 

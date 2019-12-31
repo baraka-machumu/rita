@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\DeathRegistration;
 
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +47,7 @@ class BirthVerificationController extends Controller
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
 
         $tab  =  2;
+        Session::flash('alert-success','Task Taken');
 
         return redirect('death-certificates/'.$tab.'/verify');
 
@@ -69,14 +72,16 @@ class BirthVerificationController extends Controller
 
 //                return response()->json($vdata);
 
-        return view('deaths.verify_certificate.view_verify_data',compact('vdata','is_result'));
+        $attachment = $this->getAttachments($vdata->ApplicationID,"17",'11');
+
+        return view('deaths.verify_certificate.view_verify_data',compact('vdata','is_result','attachment'));
 
     }
 
 
     public function serachByEntryNumber(Request $request,$trackerId){
 
-        $entryNo =444;// $request->entryNo;
+        $entryNo =$request->entryNo;
 
         if (empty($entryNo)){
 
@@ -104,13 +109,12 @@ class BirthVerificationController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->first();
 
-        $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
+        $result=  DB::table('DataInfo')->where('DeathEntryNo','=',$entryNo)->first();
 
         $is_result =  true;
+        $attachment = $this->getAttachments($vdata->ApplicationID,"17",'11');
 
-
-        return view('deaths.verify_certificate.view_verify_data',compact('vdata','result','is_result'));
-
+        return view('deaths.verify_certificate.view_verify_data',compact('attachment','vdata','result','is_result'));
 
     }
 
@@ -118,10 +122,8 @@ class BirthVerificationController extends Controller
 
         $trackerId  =  $request->trackerId;
         $searchId =  $request->verificationId;
-        $comment  =  $request->comment;
 
-        DB::table('DeathVerification')->where('DeathVerID',$searchId)->update(['Comment'=>$comment]);
-
+        CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Death Verification");
         $status =  8;
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
@@ -131,4 +133,38 @@ class BirthVerificationController extends Controller
     }
 
 
+    public  function  return($trackerId){
+
+
+        $success  =  HelperController::returnApplication($trackerId);
+
+        if ($success){
+
+            Session::flash('alert-success','Successful returned');
+
+        }
+        else {
+
+            Session::flash('alert-danger','An Error Occurred');
+
+        }
+
+
+        return redirect('death-certificates/correction/2/request');
+    }
+
+
+    public  function  getAttachments($applicationId,$type,$servTypeId){
+
+        $data  =  DB::table('ApplAttachment')
+            ->where(
+                [
+                    ['ApplicationID','=',$applicationId],
+                    ['AttachmentTypeID','=',$type],
+                    ['ServiceTypeID','=',$servTypeId]
+                ]
+            )->first();
+
+        return $data;
+    }
 }

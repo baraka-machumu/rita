@@ -4,6 +4,7 @@ namespace App\Http\Controllers\DeathRegistration;
 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -48,6 +49,8 @@ class BirthDuplicateController extends Controller
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
 
         $tab  =  2;
+
+        Session::flash('alert-success','Task Taken');
 
         return redirect('death-certificates/duplicate/'.$tab.'/request');
 
@@ -140,7 +143,9 @@ class BirthDuplicateController extends Controller
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        return redirect('death-certificates/duplicate/1/request');
+        Session::flash('alert-success','Successful Verified');
+
+        return redirect('death-certificates/duplicate/2/request');
 
     }
 
@@ -254,6 +259,26 @@ class BirthDuplicateController extends Controller
 
         return redirect('/reports/certificate/'.$entryNo.'/view/'.$type);
 
+    }
+
+    public  function  return($trackerId){
+
+
+        $success  =  HelperController::returnApplication($trackerId);
+
+        if ($success){
+
+            Session::flash('alert-success','Successful returned');
+
+        }
+        else {
+
+            Session::flash('alert-danger','An Error Occurred');
+
+        }
+
+
+        return redirect('death-certificates/correction/2/request');
     }
 
 }

@@ -62,6 +62,8 @@
                     <label>Comment</label>
                     <textarea rows="2" name="comment" class="form-control"></textarea>
 
+                    <input type="hidden" name="entryNo" value="{{$childInfo->EntryNo}}" >
+
                 </div>
             </form>
         @endif

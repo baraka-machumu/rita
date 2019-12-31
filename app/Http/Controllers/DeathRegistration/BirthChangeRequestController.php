@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\DeathRegistration;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -239,4 +240,24 @@ class BirthChangeRequestController extends Controller
 
     }
 
+
+    public  function  return($trackerId){
+
+
+        $success  =  HelperController::returnApplication($trackerId);
+
+        if ($success){
+
+            Session::flash('alert-success','Successful returned');
+
+        }
+        else {
+
+            Session::flash('alert-danger','An Error Occurred');
+
+        }
+
+
+        return redirect('death-certificates/correction/2/request');
+    }
 }

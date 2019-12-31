@@ -5,6 +5,7 @@
 @section('heading-title')
 
     <h2>Search Details & Actions</h2>
+
 @endsection
 @section('content')
 
@@ -12,6 +13,7 @@
 
         <div class="col-md-12">
 
+            @include('partials.flash_error')
 
             <table class="table table-striped">
 
@@ -59,7 +61,7 @@
             </table>
 
 
-            <form action="{{url('death-certificates/search/exist')}}" method="post">
+            <form action="{{url('death-certificates/search/exist',$cdata->TrackerID)}}" method="post">
 
                 {{csrf_field()}}
 

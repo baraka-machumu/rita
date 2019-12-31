@@ -23,4 +23,15 @@ class HelperController extends Controller
         return $data;
 
     }
+
+
+    public  static  function  returnApplication($trackerId){
+
+        $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)
+            ->update(['HandlerID'=>null,'ApplicationStatusID'=>1]);
+
+        return $success;
+
+
+    }
 }

@@ -190,7 +190,11 @@
 
     @if($is_check_modal)
 
-        @include('deaths.duplicate_certificate.check_if_data_are_correct_modal')
+        @if(!empty($result->Fname)&&!empty($result->Mname))
+
+            @include('deaths.duplicate_certificate.check_if_data_are_correct_modal')
+
+        @endif
     @endif
 
 @endsection

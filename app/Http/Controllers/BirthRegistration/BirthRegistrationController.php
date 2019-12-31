@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BirthRegistration;
 
 use App\Comment;
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helper\HelperController;
 use App\User;
@@ -41,6 +42,20 @@ class BirthRegistrationController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
 
             ->get();
+
+        if (Auth::user()->IsHQ==1){
+
+            $newBirthRegistrations =  DB::table('ServApplicationTracker as sap')
+                ->where('HandlerID','=',null)
+                ->select('as.StatusCode','sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
+                ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
+                ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+
+                ->get();
+        }
 
         $handlerId  =  Auth::user()->StaffID;
         $statusCode  =  300;
@@ -97,6 +112,25 @@ class BirthRegistrationController extends Controller
 
             ->get();
 
+        if (Auth::user()->IsHQ==1){
+
+            $newBirthRegProcessingRequests =  DB::table('ServApplicationTracker as sap')
+
+                ->where([
+
+                    ['sap.ApplicationStatusID','=',$statusId],
+
+                ])
+                ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
+                ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
+                ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+
+                ->get();
+        }
+
 
         $newBirthRegProcessingTasks =  DB::table('ServApplicationTracker as sap')
 
@@ -148,6 +182,25 @@ class BirthRegistrationController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
 
             ->get();
+
+
+        if (Auth::user()->IsHQ==1){
+            $newBirthRegissues =  DB::table('ServApplicationTracker as sap')
+
+                ->where([
+
+                    ['sap.ApplicationStatusID','=',$statusId],
+
+                ])
+                ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
+                ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
+                ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+
+                ->get();
+        }
 
         //printed tab
 
@@ -561,7 +614,9 @@ class BirthRegistrationController extends Controller
 //        dd($applicationId);
         $servTypeId  =  1;//$servApp->ServiceTypeID;
 
-       $this->commentSave($request,$handlerId,$trackerId,"Issue");
+
+        CommentController::commentSave($request,$handlerId,$trackerId,"Issue");
+
 
        DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['NoCopyPrinted'=>$servApp->NoCopyPrinted+1]);
 

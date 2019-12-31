@@ -45,7 +45,7 @@ class PrintController extends Controller
 
             // type 4 == new death certificate
 
-            $URL_TO_PRINT =  "/reports/birth-correction-certificate/print";
+            $URL_TO_PRINT =  "/reports/new-death-certificate/print";
 
         }
 
@@ -98,7 +98,7 @@ class PrintController extends Controller
 
         $server  =  new Client($url,$user,$password);
 
-        $report_url =  "/reports/rita/birth_certificate";
+        $report_url =  "/reports/rita/death_certificate";
 
         $inputControls   = [
 

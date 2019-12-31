@@ -48,9 +48,14 @@ class LoginController extends Controller
         return "Email";
     }
 
-    public  function  login(Request $request)
+    public  function  showLoginForm()
     {
 
+        return  view('auth.login');
+    }
+
+    public  function  login(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -64,7 +69,6 @@ class LoginController extends Controller
             return redirect()->back()->withInput();
 
         }
-
 
         else {
 
@@ -88,4 +92,7 @@ class LoginController extends Controller
 
 
     }
+
+
+
 }

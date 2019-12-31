@@ -46,6 +46,8 @@ class BirthSearchController extends Controller
          $cdata=   DB::table('ServApplicationTracker as sap')
              ->where('sap.ServiceTypeID','=',5)
              ->where('sap.HandlerID','=',$handlerId)
+             ->where('sap.TrackerID','=',$trackerId)
+
              ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
              ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
              ->join('BirthSearch as bv','bv.SearchID','sap.ApplicationID')->first();
@@ -60,17 +62,25 @@ class BirthSearchController extends Controller
      }
 
 
-     public  function checkExisteByEntryNumber(Request $request){
+     public  function checkExisteByEntryNumber(Request $request,$trackerId){
 
         $entryNo =  $request->entryNumberSearch;
 
+         if ($entryNo==null){
 
+             Session::flash('alert-warning',' No Entry Number Speficied..');
+
+             return redirect()->back();
+         }
          $result =  DB::table('DataInfo')->where('EntryNo',$entryNo)->first();
+         $handlerId  =  Auth::user()->StaffID;
 
 
          $cdata=   DB::table('ServApplicationTracker as sap')
              ->where('sap.ServiceTypeID','=',5)
-             ->where('sap.HandlerID','=',null)
+             ->where('sap.HandlerID','=',$handlerId)
+             ->where('sap.TrackerID','=',$trackerId)
+
              ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
              ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
              ->join('BirthSearch as bv','bv.SearchID','sap.ApplicationID')->first();

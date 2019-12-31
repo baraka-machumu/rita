@@ -22,13 +22,29 @@ class BirthChangeRequestController extends Controller
         $dublicates =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',7)
             ->where('sap.HandlerID','=',null)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
 
-        $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+
+            $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',7)
+                ->where('sap.HandlerID','=',null)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+
+
+        }
+
+            $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',7)
             ->where('sap.ApplicationStatusID','=',1)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
@@ -159,7 +175,9 @@ class BirthChangeRequestController extends Controller
 
         $issues =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',7)
-            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+//            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
             ->where('sap.ApplicationStatusID','=',3)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -167,7 +185,21 @@ class BirthChangeRequestController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
 
-        $printed=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+            $issues =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',7)
+//                ->where('sap.HandlerID','=',Auth::user()->StaffID)
+                ->where('sap.ApplicationStatusID','=',3)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+
+        }
+
+
+            $printed=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',7)
             ->where('sap.ApplicationStatusID','=',5)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)

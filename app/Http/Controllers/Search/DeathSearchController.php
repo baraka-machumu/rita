@@ -36,8 +36,6 @@ class DeathSearchController extends Controller
 
      public  function  viewBirthCertificateSearch($trackerId){
 
-
-
          $handlerId  =  Auth::user()->StaffID;
 
          $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
@@ -61,19 +59,26 @@ class DeathSearchController extends Controller
 
      }
 
-
-     public  function checkExisteByEntryNumber(Request $request){
+     public  function checkExisteByEntryNumber(Request $request,$trackerId){
 
         $entryNo =  $request->entryNumberSearch;
 
 
-         $result =  DB::table('DataInfo')->where('EntryNo',$entryNo)->first();
+        if ($entryNo==null){
+
+            Session::flash('alert-warning',' No Entry Number Speficied..');
+
+            return redirect()->back();
+        }
+         $result =  DB::table('DataInfo')->where('DeathEntryNo',$entryNo)->first();
 
          $handlerId  =  Auth::user()->StaffID;
 
          $cdata=   DB::table('ServApplicationTracker as sap')
              ->where('sap.ServiceTypeID','=',10)
              ->where('sap.HandlerID','=',$handlerId)
+             ->where('sap.TrackerID','=',$trackerId)
+
              ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
              ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
              ->join('DeathSearch as bv','bv.SearchID','sap.ApplicationID')->first();

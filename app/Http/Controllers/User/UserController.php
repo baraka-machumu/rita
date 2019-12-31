@@ -89,6 +89,8 @@ class UserController extends Controller
         $department =  $request->department;
 
         $permission =  $request->permission;
+        $isHq  =  $request->is_hq;
+
         $user  =  new User();
 
 
@@ -101,6 +103,7 @@ class UserController extends Controller
         $user->isActive  = 1; // 1 for active user
         $user->CreatedByID= Auth::user()->StffID;
         $user->DepartmentID  = $department;
+        $user->IsHQ =  $isHq;
 
         $user->CreatedDate  =  Carbon::now();
 

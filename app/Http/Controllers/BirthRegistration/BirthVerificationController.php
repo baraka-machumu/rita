@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BirthRegistration;
 
+use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,19 @@ class BirthVerificationController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('BirthVerification as bv','bv.VerificationID','sap.ApplicationID')->get();
 
-        $myTaskverifications=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1) {
+
+            $verifications=  DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',6)
+                ->where('sap.HandlerID','=',null)
+//                ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('BirthVerification as bv','bv.VerificationID','sap.ApplicationID')->get();
+
+        }
+            $myTaskverifications=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',6)
             ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
 
@@ -123,15 +136,14 @@ class BirthVerificationController extends Controller
 
         $trackerId  =  $request->trackerId;
         $searchId =  $request->verificationId;
-        $comment  =  $request->comment;
 
-        DB::table('BirthVerification')->where('verificationId',$searchId)->update(['Comment'=>$comment]);
 
+      CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Verification Service");
         $status =  8;
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        Session::flash('alert-success','Verfied');
+        Session::flash('alert-success','Verified');
 
         return redirect('birth-certificates/2/verify');
 

@@ -100,6 +100,21 @@
 
                 </div>
 
+
+                <div class="form-group">
+                    <label for="is_hq">Is HQ</label>
+                    <select id="is_hq" class="form-control" name="is_hq">
+
+                        <option selected disabled>Please Select Office Type</option>
+
+                            <option value="1">Yes</option>
+                        <option value="0">NO</option>
+
+
+                    </select>
+
+                </div>
+
             </div>
 
             <div class="col-md-12">

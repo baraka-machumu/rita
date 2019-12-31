@@ -71,7 +71,7 @@
 
             <button type="submit" class="btn btn-primary">Search</button>
 
-            <a href="{{url('birth-certificates/verify/return',$vdata->TrackerID)}}" class="btn btn-success">Return</a>
+{{--            <a href="{{url('birth-certificates/verify/return',$vdata->TrackerID)}}" class="btn btn-success">Return</a>--}}
 
             <a href="{{url()->previous()}}" class="btn btn-info">Back</a>
 

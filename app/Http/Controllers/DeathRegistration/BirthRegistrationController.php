@@ -5,6 +5,7 @@ namespace App\Http\Controllers\DeathRegistration;
 use App\Comment;
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -196,6 +197,8 @@ class BirthRegistrationController extends Controller
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
 
         $tab  =  2;
+        Session::flash('alert-success', 'Task Taken');
+
         return redirect('death-certificates/'.$tab.'/new-request');
 
     }
@@ -227,7 +230,7 @@ class BirthRegistrationController extends Controller
 
         $childInfo =   DB::table('ServApplicationTracker as sap')
             ->where('TrackerID','=',$trackerId)
-            ->select('c.CountryName','sex.SexName','pi.Occupation','pi.Street','pi.PhysicalAddress','pi.email','pi.IdentNo','sap.NoCopyPrinted','pi.MiddleName','pi.OtherName','pi.DOB','pi.NIN','pi.PhoneNo','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
+            ->select('ds.EntryNo','c.CountryName','sex.SexName','pi.Occupation','pi.Street','pi.PhysicalAddress','pi.email','pi.IdentNo','sap.NoCopyPrinted','pi.MiddleName','pi.OtherName','pi.DOB','pi.NIN','pi.PhoneNo','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
             ->join('DeathService as ds','ds.DeathServID','sap.ApplicationID')
 
             ->join('PersonalInfo as pi','pi.PersonalID','=','ds.DeceasedID')
@@ -288,6 +291,8 @@ class BirthRegistrationController extends Controller
 
         $tab  =  2;
 
+        Session::flash('alert-success', 'Task Taken');
+
         return redirect('death-certificates/'.$tab.'/new-processing');
 
     }
@@ -330,7 +335,7 @@ class BirthRegistrationController extends Controller
 
             CommentController::commentSave($request,$handlerId,$trackerId,"Approve");
 
-            Session::flash('alert-success','Successful Verified');
+            Session::flash('alert-success','Successful Approved');
         }
 
         else {
@@ -349,6 +354,8 @@ class BirthRegistrationController extends Controller
         $issue =  true;
         $childInfo =  $this->getChildInfo($trackerId);
 
+
+//        return response()->json($childInfo);
         $attachments  =  DB::table('ApplAttachment as aa')
             ->join('AttachementType as at','at.AttachmentTypeID','=','aa.AttachmentTypeID')
             ->where('ApplicationID',$trackerId)->get();
@@ -365,20 +372,23 @@ class BirthRegistrationController extends Controller
 
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$statusId]);
 
-        $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
+        $servApp  = DB::table('ServApplicationTracker')->select('ApplicationID')->where('TrackerID',$trackerId)->first();
 
         $applicationId =  $servApp->ApplicationID;
-        $servTypeId  =  4;//$servApp->ServiceTypeID;
+        $servTypeId  =  4;
 
-
-//        dd($entryNo);
         CommentController::commentSave($request,$handlerId,$trackerId,"Approve");
 
-        $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?,?',array($applicationId,$servTypeId,$handlerId,4));
+        $birthEntryNo =  $request->entryNo;
 
+//        dd($applicationId);
+        $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?,?',array($applicationId,$servTypeId,$handlerId,null));
+
+
+//        return response()->json($result);
         if ($result[0]->resultCode==0){
-            $entryNo  =  DB::table('DeathService')->where('DeathServID',$applicationId)->first()->EntryNo;
 
+            $entryNo  =  DB::table('DeathService')->where('DeathServID',$applicationId)->first()->EntryNo;
 
             Session::flash('alert-success','Successful issued now you can print');
 
@@ -408,6 +418,27 @@ class BirthRegistrationController extends Controller
         $comment->StaffID  =  $handlerId;
         $comment->TrackerID  =  $trackerId;
         $comment->save();
+    }
+
+
+    public  function  return($trackerId){
+
+
+        $success  =  HelperController::returnApplication($trackerId);
+
+        if ($success){
+
+            Session::flash('alert-success','Successful returned');
+
+        }
+        else {
+
+            Session::flash('alert-danger','An Error Occurred');
+
+        }
+
+
+        return redirect('death-certificates/correction/2/request');
     }
 
 }

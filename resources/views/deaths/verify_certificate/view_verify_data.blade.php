@@ -59,13 +59,25 @@
             </tr>
 
             <tr>
-                <th>Attachment</th><td>Not Available</td>
+                <th>Attachment</th><td>
+
+                    @if($attachment)
+                    {{$attachment->AttachmentPath}}
+
+                        @else
+
+                        <span style="color: red;">
+                            No Attachment
+                        </span>
+                        @endif
+
+                </td>
             </tr>
             </tbody>
 
         </table>
 
-        <form method="post" action="{{url('birth-certificates/verify/search-byentry-number',$vdata->TrackerID)}}">
+        <form method="post" action="{{url('death-certificates/verify/search-byentry-number',$vdata->TrackerID)}}">
 
             {{csrf_field()}}
 
@@ -73,7 +85,7 @@
 
             <button type="submit" class="btn btn-primary">Search</button>
 
-            <a href="{{url('birth-certificates/verify/return',$vdata->TrackerID)}}" class="btn btn-success">Return</a>
+            <a href="{{url('death-certificates/verify/return',$vdata->TrackerID)}}" class="btn btn-success">Return</a>
 
             <a href="{{url()->previous()}}" class="btn btn-info">Back</a>
 
@@ -136,11 +148,11 @@
                         <td>1</td>
                         <td>{{$result->Fname}}</td>
                         <td>{{$result->Mname}}</td>
-                        <td>{{$result->Sname}}</td>
+                        <td>{{$result->Surname}}</td>
                         <td>{{$result->DOB}}</td>
                         <td>
 
-                            <a href="{{url('birth-certificates/search/view/1')}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+{{--                            <a href="{{url('birth-certificates/search/view/1')}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>--}}
 
                         </td>
                     </tr>
@@ -168,7 +180,7 @@
 
 
                     <input type="hidden" name="trackerId" value="{{$vdata->TrackerID}}">
-                    <input type="hidden" name="verificationId" value="{{$vdata->VerificationID}}">
+{{--                    <input type="hidden" name="verificationId" value="{{$vdata->VerificationID}}">--}}
 
                 </div>
                 <div class="form-group">

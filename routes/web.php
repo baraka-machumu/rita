@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', 'Auth\LoginController@showLoginForm');
+
+
+
 
 Route::get('test',function (){
 
@@ -121,7 +123,7 @@ Route::group(['prefix'=>'birth-certificates'],function (){
 
     Route::get('/search/view/{searchId}','Search\BirthSearchController@viewBirthCertificateSearch');
     Route::post('search/send-back-result','Search\BirthSearchController@sendBackResult');
-    Route::post('search/exist','Search\BirthSearchController@checkExisteByEntryNumber');
+    Route::post('search/exist/{trackerId}','Search\BirthSearchController@checkExisteByEntryNumber');
 
 
     //verify
@@ -216,7 +218,7 @@ Route::group(['prefix'=>'death-certificates'],function (){
 
     Route::get('/search/view/{searchId}','Search\DeathSearchController@viewBirthCertificateSearch');
     Route::post('search/send-back-result','Search\DeathSearchController@sendBackResult');
-    Route::post('search/exist','Search\DeathSearchController@checkExisteByEntryNumber');
+    Route::post('search/exist/{trackerId}','Search\DeathSearchController@checkExisteByEntryNumber');
 
     //verify
     Route::post('verify/search-byentry-number/{trackerId}','DeathRegistration\BirthVerificationController@serachByEntryNumber');
@@ -288,6 +290,20 @@ Route::group(['prefix'=>'hospitals'],function (){
 
 });
 
+
+//offices
+
+Route::group(['prefix'=>'offices'],function (){
+
+    Route::get('/','Office\RitaOfficeController@index');
+    Route::get('/create','Office\RitaOfficeController@create');
+    Route::post('/store','Office\RitaOfficeController@store');
+    Route::get('/{hospitalId}/edit','Office\RitaOfficeController@edit')->name('office-edit');
+
+    Route::post('/update/{hospitalId}','Office\RitaOfficeController@update');
+
+});
+
 //regions
 
 Route::group(['prefix'=>'regions'],function (){
@@ -322,7 +338,9 @@ Route::post('login','Auth\LoginController@login')->name('login');
 
 Route::get('logout','Auth\LoginController@logout')->name('logout');
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/', 'Auth\LoginController@showLoginForm')->name('/');
 
 //search
 
@@ -342,7 +360,10 @@ Route::group(['prefix'=>'reports'],function (){
 
 
     //Death cert
+//    Route::get('/new-death-certificate/print/{entryNo}','Report\PrintController@deathPrint');
+    Route::get('/death-correction-certificate/print/{entryNo}','Report\PrintController@deathPrint');
     Route::get('/new-death-certificate/print/{entryNo}','Report\PrintController@deathPrint');
+
 //    Route::get('/new-death-certificate/{entryNo}/view/{type}','Report\PrintController@deathCertificte');
 
 

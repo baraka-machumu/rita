@@ -29,7 +29,23 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('BirthDuplicate as bd','bd.DupID','sap.ApplicationID')->get();
 
-        $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+
+            $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',2)
+                ->where('sap.HandlerID','=',null)
+
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('BirthDuplicate as bd','bd.DupID','sap.ApplicationID')->get();
+
+
+        }
+
+
+            $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',2)
             ->where('sap.ApplicationStatusID','=',1)
             ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
@@ -165,7 +181,7 @@ class BirthDuplicateController extends Controller
 
         $issues =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',2)
-//            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
             ->where('sap.ApplicationStatusID','=',3)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -173,7 +189,20 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('BirthDuplicate as bd','bd.DupID','sap.ApplicationID')->get();
 
-        $printed=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+
+            $issues =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',2)
+                ->where('sap.ApplicationStatusID','=',3)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('BirthDuplicate as bd','bd.DupID','sap.ApplicationID')->get();
+
+        }
+
+            $printed=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',2)
             ->where('sap.ApplicationStatusID','=',5)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
@@ -254,16 +283,11 @@ class BirthDuplicateController extends Controller
     }
 
 
-    public  function  issueStore($trackerId){
+    public  function  issueStore(Request $request,$trackerId){
 
         $status =  5;
 
-        $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
-
-        $applicationId =  $servApp->ApplicationID;
-        $entryNo  =  DB::table('BirthService')->where('BirthServID',$applicationId)->first()->EntryNo;
-
-//        $entryNo = '192005962068';
+        $entryNo =  $request->entryNo;
         if (!$entryNo){
 
             Session::flash('alert-danger','The Entry Number Is Not Valid Number.');

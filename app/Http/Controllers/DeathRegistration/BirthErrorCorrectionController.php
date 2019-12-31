@@ -4,6 +4,7 @@ namespace App\Http\Controllers\DeathRegistration;
 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +50,8 @@ class BirthErrorCorrectionController extends Controller
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
 
         $tab  =  2;
+        Session::flash('alert-success','Task Taken');
+
 
         return redirect('death-certificates/correction/'.$tab.'/request');
 
@@ -137,7 +140,7 @@ class BirthErrorCorrectionController extends Controller
 
         CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Verify");
 
-        return redirect('death-certificates/correction/1/request');
+        return redirect('death-certificates/correction/2/request');
 
     }
 
@@ -317,6 +320,26 @@ class BirthErrorCorrectionController extends Controller
 //         return response()->json($result);
         }
 
+    }
+
+    public  function  return($trackerId){
+
+
+       $success  =  HelperController::returnApplication($trackerId);
+
+       if ($success){
+
+           Session::flash('alert-success','Successful returned');
+
+       }
+        else {
+
+            Session::flash('alert-danger','An Error Occurred');
+
+        }
+
+
+        return redirect('death-certificates/correction/2/request');
     }
 
 }

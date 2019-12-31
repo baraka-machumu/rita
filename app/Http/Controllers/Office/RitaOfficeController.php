@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\RegisteredHosp;
 use App\RitaOffice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RitaOfficeController extends Controller
 {
@@ -23,5 +24,14 @@ class RitaOfficeController extends Controller
             $offices  =  RitaOffice::all()->toArray();
 
             return  view('offices.index',compact('offices'));
+    }
+
+
+    public  function  create(){
+
+        $regions  =  DB::table('Region')->get();
+
+        return  view('offices.create',compact('regions'));
+
     }
 }

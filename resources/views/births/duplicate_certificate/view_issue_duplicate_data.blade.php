@@ -165,6 +165,8 @@
                     <label for="comment">Comment</label>
                     <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
 
+                    <input type="hidden" name="entryNo" value="{{$ddata->EntryNo}}">
+
                 </div>
 
                 <div class="form-group">

@@ -27,6 +27,21 @@ class BirthErrorCorrectionController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
 
+
+        if (Auth::user()->IsHQ==1){
+
+            $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',3)
+                ->where('sap.HandlerID','=',null)
+//                ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
+
+        }
         $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',3)
             ->where('sap.ApplicationStatusID','=',1)
@@ -37,6 +52,9 @@ class BirthErrorCorrectionController extends Controller
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
+
+
+//                return response()->json($dublicates);
 
         return view('births.change_certificate_details.tab_error',compact('tab','dublicates','myTaskDuplicates'));
 
@@ -50,6 +68,7 @@ class BirthErrorCorrectionController extends Controller
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['HandlerID'=>$handlerId]);
 
         $tab  =  2;
+        Session::flash('alert-success','Task Taken');
 
         return redirect('birth-certificates/correction/'.$tab.'/request');
 
@@ -112,13 +131,13 @@ class BirthErrorCorrectionController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->first();
 
+//        return response()->json($ddata);
         $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
 
         $verify =  true;
         $issue  =  false;
         $is_result= true;
         $issue_search = true;
-
 
         return view('births.change_certificate_details.view_error_data',compact('issue_search','is_result','verify','issue','ddata','result'));
 
@@ -136,7 +155,7 @@ class BirthErrorCorrectionController extends Controller
 
         $result  = $this->changeDetails($request);
 
-       // return response()->json($result);
+        // return response()->json($result);
 
         Session::flash('alert-success','Successful changed.');
 
@@ -184,15 +203,26 @@ class BirthErrorCorrectionController extends Controller
 
         $issues =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',3)
-//            ->where('sap.HandlerID','=',Auth::user()->StaffID)
             ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
 
-        $printed=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1) {
+
+            $issues =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',3)
+                ->where('sap.ApplicationStatusID','=',3)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
+
+        }
+            $printed=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',3)
             ->where('sap.ApplicationStatusID','=',5)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
@@ -281,12 +311,13 @@ class BirthErrorCorrectionController extends Controller
 
         $type  = 5;
 
-        $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
+//        $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
+//
+//        $applicationId =  $servApp->ApplicationID;
+//        $entryNo  =  DB::table('BirthService')->where('BirthServID',$applicationId)->first()->EntryNo;
 
-        $applicationId =  $servApp->ApplicationID;
-        $entryNo  =  DB::table('BirthService')->where('BirthServID',$applicationId)->first()->EntryNo;
 
-
+        $entryNo =  $request->entryNo;
 
         if (!$entryNo){
 
@@ -325,29 +356,91 @@ class BirthErrorCorrectionController extends Controller
         $fLastName  =  $request->fLastName;
         $fcountryBirth  =  $request->fcountryBirth;
 
-        $correctionFlag  =  $request->correctionFlag;
+        $correctionFlag  =  $request->changedeCode;
         $entryNo  =  $request->entryNo;
 
         $staffId =  Auth::user()->StaffID;
         $applicationId =  $request->applicationId;
         $frontUserId =  $request->frontUserId;
 
+            switch ($correctionFlag){
 
-        if ($correctionFlag==100){
+                //CMF CODE INTERPRETATION
+                //chilf
+                case '100':
+                    $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+                        array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
+                            $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'Y','N','N',
+                            $applicationId,$frontUserId,$staffId));
 
-            $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
-                array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
-                    $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'Y','N','N',
-                    $applicationId,$frontUserId,$staffId)
-            );
+                    break;
 
-//            return $result;
+                case '101':
+                    $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+                        array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
+                            $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'Y','N','Y',
+                            $applicationId,$frontUserId,$staffId));
+                    break;
+
+                case '110':
+
+                    $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+                        array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
+                            $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'Y','Y','N',
+                            $applicationId,$frontUserId,$staffId));
+
+                    break;
+
+                //mother
+                case '010':
+
+                    $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+                        array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
+                            $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'N','Y','N',
+                            $applicationId,$frontUserId,$staffId));
+                    break;
+
+
+
+                case '011':
+
+                    $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+                        array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
+                            $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'N','Y','Y',
+                            $applicationId,$frontUserId,$staffId));
+                    break;
+
+                    //father
+
+                case '001':
+
+                    $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+                        array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
+                            $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'N','N','Y',
+                            $applicationId,$frontUserId,$staffId));
+                    break;
+
+                    //all
+
+                case '111':
+
+                    $result = DB::update('EXEC  Update_Childinfo_SP  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+                        array($entryNo,$cFirstName,$cMiddleName,$cLastName,null,$mFirstName,$mMiddleName,$mLastName,null,
+                            $ffirstName,$fMiddleName,$fLastName,null,null,$dob,null,null,$chospital,'Y','Y','Y',
+                            $applicationId,$frontUserId,$staffId));
+                    break;
+
+
+                default:
+
+                    return "Uknown Exception";
+            }
 
 //            return response()->json($result);
         }
 
 
-    }
+
 
 
 
