@@ -19,7 +19,9 @@ class BirthErrorCorrectionController extends Controller
         $dublicates =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',9)
             ->where('sap.HandlerID','=',null)
+//            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
             ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ApplicationStatusID','=',1)
 
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -27,7 +29,23 @@ class BirthErrorCorrectionController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
 
-        $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+
+            $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',9)
+                ->where('sap.HandlerID','=',null)
+//                ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+                ->where('sap.ApplicationStatusID','=',1)
+
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
+
+        }
+
+            $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',9)
             ->where('sap.ApplicationStatusID','=',1)
             ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
@@ -38,9 +56,74 @@ class BirthErrorCorrectionController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
 
-        return view('deaths.change_certificate_details.tab_error',compact('tab','dublicates','myTaskDuplicates'));
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+
+        return view('deaths.change_certificate_details.tab_error',compact('regions','districts','tab','dublicates','myTaskDuplicates'));
 
     }
+
+
+    public  function process($tab) {
+
+        $dublicates =     DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
+
+            ->where('sap.ServiceTypeID','=',9)
+            ->where('sap.NextToActID','=',null)
+//            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ApplicationStatusID','=',3)
+
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
+
+        if (Auth::user()->IsHQ==1){
+
+            $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',9)
+                ->where('sap.HandlerID','=',null)
+//                ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+                ->where('sap.ApplicationStatusID','=',3)
+
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+                ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
+
+        }
+
+        $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
+
+            ->where('sap.ServiceTypeID','=',9)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
+                ->where('sap.NextToActID','=',Auth::user()->StaffID)
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+
+        return view('deaths.change_certificate_details.tab_error_process',compact('regions','districts','tab','dublicates','myTaskDuplicates'));
+
+    }
+
+
 
     // function to assign task to rita staff
     public  function  myTask($trackerId){
@@ -183,6 +266,8 @@ class BirthErrorCorrectionController extends Controller
         $issues =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',9)
 //            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
             ->where('sap.ApplicationStatusID','=',3)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -190,7 +275,21 @@ class BirthErrorCorrectionController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
 
-        $printed=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+
+            $issues =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',9)
+//            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+                ->where('sap.ApplicationStatusID','=',3)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
+
+        }
+
+            $printed=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',9)
             ->where('sap.ApplicationStatusID','=',5)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
@@ -199,8 +298,11 @@ class BirthErrorCorrectionController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathErrorCollection as cr','cr.ErrorID','sap.ApplicationID')->get();
 
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
 //        return response()->json($issues);
-        return view('deaths.change_certificate_details.tab_issue',compact('tab','issues','printed'));
+        return view('deaths.change_certificate_details.tab_issue',compact('regions','districts','tab','issues','printed'));
 
     }
 

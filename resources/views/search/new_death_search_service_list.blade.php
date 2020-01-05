@@ -1,16 +1,16 @@
 
-@extends('layouts.master')
-
-@section('heading-title')
-
-    <h2>Search Requests</h2>
-@endsection
-@section('content')
-
     <div class="row top-margin-tab">
 
         <div class="col-md-12">
+            @if (Auth::user()->IsHQ==1)
 
+                <?php
+                $statusId  = 1;
+                $btnName = "btn-filter-death-requests-search";
+                ?>
+                @include('helpers.filer_form',compact('statusId','btnName'))
+
+            @endif
             @include('partials.flash_error')
 
             <table class="table table-striped">
@@ -30,7 +30,7 @@
         <div class="col-md-12">
 
 
-            <table class="table table-bordered table-striped" id="datatable">
+            <table class="table table-bordered  table-death-request-search" id="datatable">
 
                 <thead>
 
@@ -41,7 +41,8 @@
                     <th>Middle Name</th>
                     <th>Last Name</th>
                     <th>Date Of Birth</th>
-
+                    <th>Processing Office</th>
+                    <th>Nearest Office</th>
                     <th>Action</th>
 
                 </tr>
@@ -59,6 +60,8 @@
                         <td>{{$result->Mname}}</td>
                         <td>{{$result->Surname}}</td>
                         <td>{{$result->DOD}}</td>
+                        <td>{{$result->OfficeName}}</td>
+                        <td>{{$result->NearestOffice}}</td>
                         <td>
 
                             <a href="{{url('death-certificates/search/view',$result->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
@@ -78,5 +81,3 @@
         </div>
 
     </div>
-
-@endsection

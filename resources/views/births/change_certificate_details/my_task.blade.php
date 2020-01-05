@@ -12,9 +12,10 @@
                 <th>No</th>
                 <th>Full Name</th>
                 <th>Processing Office</th>
+                <th>Nearest Office</th>
                 <th>Service Type</th>
                 <th>Application Status</th>
-
+                <th>Application ID</th>
                 <th>Date</th>
 
                 <th>Action</th>
@@ -28,10 +29,12 @@
                 <tr>
                     <td>{{$index+1}}</td>
 
-                    <td>{{$myTaskDuplicate->ChildFname.' '.$myTaskDuplicate->ChildMname.' '.$myTaskDuplicate->ChildSurname}}</td>
-                    <td>{{$myTaskDuplicate->OfficeName}}</td>
+                    <td>{{$myTaskDuplicate->ChildFname.' '.$myTaskDuplicate->ChildMname.' '}}</td>
+                    <td>{{$myTaskDuplicate->ProcessingOffice}}</td>
+                    <td>{{$myTaskDuplicate->NearOffice}}</td>
                     <td>{{$myTaskDuplicate->ServTypeName}}</td>
                     <td>{{$myTaskDuplicate->StatusName}}</td>
+                    <td>{{$myTaskDuplicate->ApplicationID}}</td>
                     <td>{{$myTaskDuplicate->CreatedDate}}</td>
 
                     <td>

@@ -163,7 +163,34 @@
             </table>
 
 
-            <form action="{{url('birth-certificates/verify/response')}}"  method="post">
+          @if($processing)
+
+                <form action="{{url('birth-certificates/verify/approve')}}"  method="post">
+
+                    {{csrf_field()}}
+
+                    <div class="form-group">
+
+                        <label for="comment">Comment</label>
+                        <textarea class="form-control" rows="2" required name="comment" id="comment"></textarea>
+
+
+                        <input type="hidden" name="trackerId" value="{{$vdata->TrackerID}}">
+                        <input type="hidden" name="verificationId" value="{{$vdata->VerificationID}}">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <button type="submit" name="send-back-result" class="btn btn-success">Approve</button>
+
+
+                    </div>
+                </form>
+
+
+              @else  <form action="{{url('birth-certificates/verify/response')}}"  method="post">
 
                 {{csrf_field()}}
 
@@ -177,21 +204,17 @@
                     <input type="hidden" name="verificationId" value="{{$vdata->VerificationID}}">
 
                 </div>
-                <div class="form-group">
 
-                    <input type="file" name="file" class="form-control">
-
-
-                </div>
 
                 <div class="form-group">
 
-                    <button type="submit" name="send-back-result" class="btn btn-success">Commit</button>
+                    <button type="submit" name="send-back-result" class="btn btn-success">Verify</button>
 
 
                 </div>
             </form>
 
+              @endif
 
         </div>
     @endif

@@ -39,7 +39,8 @@
 
                                     <li><a href="{{url('birth-certificates/replace/1/request')}}">Requests</a>
                                     </li>
-
+                                    <li><a href="{{url('birth-certificates/replace/1/processing')}}">Processing</a>
+                                    </li>
                                     <li><a href="{{url('birth-certificates/replace/1/issue')}}">Issue</a>
                                     </li>
 
@@ -53,6 +54,8 @@
                                 <ul class="nav child_menu">
 
                                     <li><a href="{{url('birth-certificates/duplicate/1/request')}}">Requests</a>
+                                    </li>
+                                    <li><a href="{{url('birth-certificates/duplicate/1/processing')}}">Processing</a>
                                     </li>
 
                                     <li><a href="{{url('birth-certificates/duplicate/1/issue')}}">Issue</a>
@@ -69,16 +72,44 @@
                                     <li><a href="{{url('birth-certificates/correction/1/request')}}">Requests</a>
                                     </li>
 
+                                    <li><a href="{{url('birth-certificates/correction/1/processing')}}">Processing</a>
+                                    </li>
+
                                     <li><a href="{{url('birth-certificates/correction/1/issue')}}">Issue</a>
                                     </li>
 
                                 </ul>
 
                             </li>
-                            <li><a href="{{url('birth-certificates/1/verify')}}">Verification Requests</a></li>
 
-                            <li><a href="{{url('birth-certificates/search')}}">Search Service</a></li>
+                            <li><a >Verification Requests<span class="fa fa-chevron-down"></span></a>
 
+                                <ul class="nav child_menu">
+
+                                    <li><a href="{{url('birth-certificates/1/verify')}}">Requests</a>
+                                    </li>
+
+                                    <li><a href="{{url('birth-certificates/verify/1/processing')}}">Processing</a>
+                                    </li>
+
+
+                                </ul>
+
+                            </li>
+                            <li><a >Search Requests<span class="fa fa-chevron-down"></span></a>
+
+                                <ul class="nav child_menu">
+
+                                    <li><a href="{{url('birth-certificates/search/1/request')}}">Requests</a>
+                                    </li>
+
+                                    <li><a href="{{url('birth-certificates/search/1/processing')}}">Processing</a>
+                                    </li>
+
+
+                                </ul>
+
+                            </li>
                         </ul>
                     </li>
 
@@ -102,19 +133,21 @@
                                         </li>
 
                                     </ul>
-{{--                                <li><a >Replace Old  Certificate<span class="fa fa-chevron-down"></span></a>--}}
+                                <li><a >Replace Old  Certificate<span class="fa fa-chevron-down"></span></a>
 
-{{--                                    <ul class="nav child_menu">--}}
+                                    <ul class="nav child_menu">
 
-{{--                                        <li><a href="{{url('death-certificates/replace/1/request')}}">Requests</a>--}}
-{{--                                        </li>--}}
+                                        <li><a href="{{url('death-certificates/replace/1/request')}}">Requests</a>
+                                        </li>
+                                        <li><a href="{{url('death-certificates/replace/1/process')}}">Processing</a>
+                                        </li>
 
-{{--                                        <li><a href="{{url('death-certificates/replace/1/issue')}}">Issue</a>--}}
-{{--                                        </li>--}}
+                                        <li><a href="{{url('death-certificates/replace/1/issue')}}">Issue</a>
+                                        </li>
 
-{{--                                    </ul>--}}
+                                    </ul>
 
-{{--                                </li>--}}
+                                </li>
 
 
                                 <li><a>Duplicate  Certificate<span class="fa fa-chevron-down"></span></a>
@@ -122,6 +155,9 @@
                                     <ul class="nav child_menu">
 
                                         <li><a href="{{url('death-certificates/duplicate/1/request')}}">Requests</a>
+                                        </li>
+
+                                        <li><a href="{{url('death-certificates/duplicate/1/processing')}}">Processing</a>
                                         </li>
 
                                         <li><a href="{{url('death-certificates/duplicate/1/issue')}}">Issue</a>
@@ -137,16 +173,45 @@
 
                                         <li><a href="{{url('death-certificates/correction/1/request')}}">Requests</a>
                                         </li>
-
+                                        <li><a href="{{url('death-certificates/correction/1/processing')}}">Processing</a>
+                                        </li>
                                         <li><a href="{{url('death-certificates/correction/1/issue')}}">Issue</a>
                                         </li>
 
                                     </ul>
 
                                 </li>
-                                <li><a href="{{url('death-certificates/1/verify')}}">Verification Requests</a></li>
+{{--                                <li><a href="{{url('death-certificates/1/verify')}}">Verification Requests</a></li>--}}
 
-                                <li><a href="{{url('death-certificates/search')}}">Search Service</a></li>
+                                <li><a >Verification Requests<span class="fa fa-chevron-down"></span></a>
+
+                                    <ul class="nav child_menu">
+
+                                        <li><a href="{{url('death-certificates/1/verify')}}">Requests</a>
+                                        </li>
+
+                                        <li><a href="{{url('death-certificates/verify/1/processing')}}">Processing</a>
+                                        </li>
+
+
+                                    </ul>
+
+                                </li>
+
+                                <li><a >Search Service<span class="fa fa-chevron-down"></span></a>
+
+                                    <ul class="nav child_menu">
+
+                                        <li><a href="{{url('death-certificates/search/1/request')}}">Requests</a>
+                                        </li>
+
+                                        <li><a href="{{url('death-certificates/search/1/processing')}}">Processing</a>
+                                        </li>
+
+
+                                    </ul>
+
+                                </li>
 
                             </ul>
                         </li>

@@ -166,25 +166,55 @@
             </table>
 
 
-            <form action="{{url('birth-certificates/duplicate/verify',$ddata->TrackerID)}}"  method="post">
+            @if($verify)
 
-                {{csrf_field()}}
+                <form action="{{url('birth-certificates/duplicate/verify',$ddata->TrackerID)}}"  method="post">
 
-                <div class="form-group">
+                    {{csrf_field()}}
 
-                    <label for="comment">Comment</label>
-                    <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
+                    <div class="form-group">
 
-                </div>
+                        <label for="comment">Comment</label>
+                        <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
 
-                <div class="form-group">
+                    </div>
 
-                    <button type="submit" name="send-back-result" class="btn btn-success">Verify</button>
+                    <div class="form-group">
 
-                    <a href="{{url('birth-certificates/duplicate/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
+                        <button type="submit" name="send-back-result" class="btn btn-success">Verify</button>
 
-                </div>
-            </form>
+                        <a href="{{url('birth-certificates/duplicate/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
+
+                    </div>
+                </form>
+
+
+            @endif
+
+            @if($processing)
+
+                <form action="{{url('birth-certificates/duplicate/process-approve',$ddata->TrackerID)}}"  method="post">
+
+                    {{csrf_field()}}
+
+                    <div class="form-group">
+
+                        <label for="comment">Comment</label>
+                        <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <button type="submit" name="send-back-result" class="btn btn-success">Approve</button>
+
+                        <a href="{{url('birth-certificates/duplicate/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>
+
+                    </div>
+                </form>
+
+
+            @endif
 
 
         </div>

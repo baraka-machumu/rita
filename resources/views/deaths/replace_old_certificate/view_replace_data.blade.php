@@ -45,22 +45,27 @@
             <tbody>
 
             <tr>
-                <th>First Name</th><td>{{$ddata->ChildFname}}</td>
+                <th>First Name</th><td>{{$ddata->DeceasedFname}}</td>
             </tr>
             <tr>
-                <th>Middle Name</th><td>{{$ddata->ChildMname}}</td>
+                <th>Middle Name</th><td>{{$ddata->DeceasedMname}}</td>
             </tr>
             <tr>
-                <th>Last Name</th><td>{{$ddata->ChildSurname}}</td>
-            </tr>
-
-            <tr>
-                <th>Date Of Birth</th><td>{{$ddata->DoB}}</td>
+                <th>Last Name</th><td>{{$ddata->DeceasedSurname}}</td>
             </tr>
 
             <tr>
+
+                <th>Date Of Death</th><td>{{$ddata->DOD}}</td>
+
+            </tr>
+
+            <tr>
+
                 <th>Attachment</th><td>Not Available</td>
+
             </tr>
+
             </tbody>
 
         </table>
@@ -69,7 +74,7 @@
 
             {{csrf_field()}}
 
-            <input type="hidden" value="{{$ddata->EntryNo}}" name="entryNo">
+            <input type="hidden" value="{{$ddata->DeceasedEntryNo}}" name="entryNo">
 
             <button type="submit" class="btn btn-primary">Search</button>
 
@@ -93,16 +98,6 @@
             <tr>
                 <th>Mother First Name</th><td>{{$ddata->MotherFname}}</td>
             </tr>
-
-
-            <tr>
-                <th>Mother  SurName</th><td>{{$ddata->MotherSurname}}</td>
-            </tr>
-
-            <tr>
-                <th>Entry Number </th><td>{{$ddata->EntryNo}}</td>
-            </tr>
-
 
 
             </tbody>

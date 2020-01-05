@@ -14,16 +14,15 @@ class CommentController extends Controller
         $this->middleware('auth');
     }
 
-    public  static function  commentSave(Request $request, $handlerId,$trackerId,$type){
+    public  static function  commentSave(Request $request, $handlerId,$trackerId,$type,$table,$Id){
 
         $comment  =  new Comment();
 
         $frontUserId  = DB::table('ServApplicationTracker as s')
             ->select('c.FrontUserID')
             ->where('TrackerID',$trackerId)
-            ->join('CorrectionError as c','c.CorID','=','s.ApplicationID')
+            ->join(''.$table.' as c','c.'.$Id.'','=','s.ApplicationID')
             ->first();
-
 
         $comment->Comment  =  $request->comment;
         $comment->StaffID  =  $handlerId;

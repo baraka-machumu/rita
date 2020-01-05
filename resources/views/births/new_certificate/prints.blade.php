@@ -13,7 +13,7 @@
                     <th>Processing Office</th>
                     <th>Near Office</th>
                     <th>Application Status</th>
-
+                    <th>Application ID</th>
                     <th>Date</th>
 
                     <th>Action</th>
@@ -30,7 +30,7 @@
                         <td>{{$newBirthprint->ProcessingOffice}}</td>
                         <td>{{$newBirthprint->NearOffice}}</td>
                         <td style="color: #097689; font-size: 17px;">{{$newBirthprint->StatusName}}</td>
-
+                        <td>{{$newBirthprint->ApplicationID}}</td>
                         <td>{{$newBirthprint->CreatedDate}}</td>
 
                         <td>

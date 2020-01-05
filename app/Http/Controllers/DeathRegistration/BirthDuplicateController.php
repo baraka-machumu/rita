@@ -26,7 +26,21 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
 
-        $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+
+            $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',8)
+                ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+                ->where('sap.HandlerID','=',null)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+
+        }
+
+            $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',8)
             ->where('sap.ApplicationStatusID','=',1)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
@@ -35,10 +49,66 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
 
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
 
-        return view('deaths.duplicate_certificate.tab_duplicate',compact('tab','dublicates','myTaskDuplicates'));
+        return view('deaths.duplicate_certificate.tab_duplicate',compact('regions','districts','tab','dublicates','myTaskDuplicates'));
 
     }
+
+    // function data handle all new birth registrations. goes here.
+    public  function process($tab) {
+
+        $dublicates =     DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
+            ->where('sap.ServiceTypeID','=',8)
+            ->where('sap.HandlerID','=',null)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.ProcessingOfficeID','=',Auth::user()->RitaOfficeID)
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+
+        if (Auth::user()->IsHQ==1){
+
+            $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->select('*','nro.OfficeName as NearestOffice')
+
+                ->where('sap.ServiceTypeID','=',8)
+                ->where('sap.HandlerID','=',null)
+                ->where('sap.ApplicationStatusID','=',3)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+                ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+
+        }
+
+        $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
+
+            ->where('sap.ServiceTypeID','=',8)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.NextToActID','=',Auth::user()->StaffID)
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+        return view('deaths.duplicate_certificate.tab_duplicate_process',compact('regions','districts','tab','dublicates','myTaskDuplicates'));
+
+    }
+
 
 
     // function to assign task to rita staff
@@ -156,6 +226,8 @@ class BirthDuplicateController extends Controller
         $issues =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',8)
 //            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
             ->where('sap.ApplicationStatusID','=',3)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -163,7 +235,23 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
 
-        $printed=  DB::table('ServApplicationTracker as sap')
+        if (Auth::user()->IsHQ==1){
+
+
+            $issues =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',8)
+//            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+                ->where('sap.ApplicationStatusID','=',3)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
+
+
+        }
+
+            $printed=  DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',8)
             ->where('sap.ApplicationStatusID','=',5)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
@@ -172,7 +260,11 @@ class BirthDuplicateController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathDuplicate as dd','dd.DuplicateID','sap.ApplicationID')->get();
 
-        return view('deaths.duplicate_certificate.tab_issue',compact('tab','issues','printed'));
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+
+        return view('deaths.duplicate_certificate.tab_issue',compact('regions','districts','tab','issues','printed'));
 
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BirthRegistration;
 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,9 +18,14 @@ class BirthErrorCorrectionController extends Controller
     public  function index($tab) {
 
         $dublicates =     DB::table('ServApplicationTracker as sap')
+            ->select('st.ServTypeName','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
+
             ->where('sap.ServiceTypeID','=',3)
             ->where('sap.HandlerID','=',null)
-            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.NearestRitaOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ApplicationStatusID','=',1)
+
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
 
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -31,9 +37,14 @@ class BirthErrorCorrectionController extends Controller
         if (Auth::user()->IsHQ==1){
 
             $dublicates =     DB::table('ServApplicationTracker as sap')
+                ->select('as.StatusCode','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
+
                 ->where('sap.ServiceTypeID','=',3)
                 ->where('sap.HandlerID','=',null)
 //                ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+                ->where('sap.ApplicationStatusID','=',1)
+
+                ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
 
                 ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
                 ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
@@ -43,20 +54,26 @@ class BirthErrorCorrectionController extends Controller
 
         }
         $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',3)
-            ->where('sap.ApplicationStatusID','=',1)
-            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->select('st.ServTypeName','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
 
+            ->where('sap.ServiceTypeID','=',3)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
-            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+            ->where('sap.NearestRitaOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ApplicationStatusID','=',1)
+
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
 
-
 //                return response()->json($dublicates);
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
 
-        return view('births.change_certificate_details.tab_error',compact('tab','dublicates','myTaskDuplicates'));
+        return view('births.change_certificate_details.tab_error',compact('regions','districts','tab','dublicates','myTaskDuplicates'));
 
     }
 
@@ -82,6 +99,7 @@ class BirthErrorCorrectionController extends Controller
         $issue  =  false;
         $is_result= false;
         $issue_search = false;
+        $processing  =  false;
 
         $ddata =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',3)
@@ -95,7 +113,109 @@ class BirthErrorCorrectionController extends Controller
 
 
 //        return response()->json($ddata);
-        return view('births.change_certificate_details.view_error_data',compact('issue_search','is_result','verify','issue','ddata'));
+        return view('births.change_certificate_details.view_error_data',compact('processing','issue_search','is_result','verify','issue','ddata'));
+
+    }
+
+    // function data handle all new birth registrations. goes here.
+    public  function processing($tab) {
+
+        $processing =     DB::table('ServApplicationTracker as sap')
+            ->select('st.ServTypeName','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
+
+            ->where('sap.ServiceTypeID','=',3)
+
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.NextToActID','=',null)
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
+
+
+        if (Auth::user()->IsHQ==1){
+
+            $processing =     DB::table('ServApplicationTracker as sap')
+                ->select('as.StatusCode','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
+
+                ->where('sap.ServiceTypeID','=',3)
+                ->where('sap.HandlerID','=',null)
+//                ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+                ->where('sap.ApplicationStatusID','=',1)
+
+                ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
+
+        }
+        $myTaskProcessing=  DB::table('ServApplicationTracker as sap')
+            ->select('st.ServTypeName','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
+
+            ->where('sap.ServiceTypeID','=',3)
+            ->where('sap.NextToActID','=',Auth::user()->StaffID)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ApplicationStatusID','=',3)
+
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
+
+//        return response()->json($myTaskProcessing);
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+        return view('births.change_certificate_details.tab_error_processing',compact('regions','districts','tab','processing','myTaskProcessing'));
+
+    }
+
+    public  function  viewProcessRequest($trackerId){
+
+        $handlerId  =  Auth::user()->StaffID;
+        $verify =  true;
+        $issue  =  false;
+        $is_result= false;
+        $issue_search = false;
+        $processing = false;
+
+        $ddata =     DB::table('ServApplicationTracker as sap')
+            ->where('sap.ServiceTypeID','=',3)
+            ->where('sap.HandlerID','=',$handlerId)
+            ->where('sap.TrackerID','=',$trackerId)
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->first();
+
+
+//        return response()->json($ddata);
+        return view('births.change_certificate_details.view_error_data',compact('processing','issue_search','is_result','verify','issue','ddata'));
+
+    }
+
+    public  function  processingMyTask($trackerId){
+
+        $handlerId  =  Auth::user()->StaffID;
+
+        $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['NextToActID'=>$handlerId]);
+
+        $tab  =  2;
+        Session::flash('alert-success','Task Taken');
+
+        return redirect('birth-certificates/correction/'.$tab.'/request');
 
     }
 
@@ -138,11 +258,29 @@ class BirthErrorCorrectionController extends Controller
         $issue  =  false;
         $is_result= true;
         $issue_search = true;
+        $processing =  true;
 
-        return view('births.change_certificate_details.view_error_data',compact('issue_search','is_result','verify','issue','ddata','result'));
+        return view('births.change_certificate_details.view_error_data',compact('processing','issue_search','is_result','verify','issue','ddata','result'));
 
     }
 
+    public  function  approveProcessRequest(Request $request,$trackerId){
+
+        $status =  10;
+
+        DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
+
+        $result  = $this->changeDetails($request);
+
+        // return response()->json($result);
+
+        Session::flash('alert-success','Successful Verified.');
+
+        CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Verify","CorrectionError",'CorID');
+
+        return redirect('birth-certificates/correction/2/processing');
+
+    }
     public  function  verify(Request $request,$trackerId){
 
         $comment  =  $request->comment;
@@ -153,13 +291,11 @@ class BirthErrorCorrectionController extends Controller
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        $result  = $this->changeDetails($request);
-
         // return response()->json($result);
 
-        Session::flash('alert-success','Successful changed.');
+        Session::flash('alert-success','Successful Verified.');
 
-        CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Verify");
+        CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Verify","CorrectionError",'CorID');
 
         return redirect('birth-certificates/correction/1/request');
 
@@ -168,12 +304,8 @@ class BirthErrorCorrectionController extends Controller
 
     public  function returnRequest(Request $request,$trackerId){
 
-
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)
             ->update(['HandlerID'=>null,'ApplicationStatusID'=>1]);
-
-
-
 
         if ($success){
 
@@ -187,11 +319,9 @@ class BirthErrorCorrectionController extends Controller
 
         $handlerId =  Auth::user()->StaffID;
 
-        CommentController::commentSave($request,$handlerId,$trackerId,"Error Correction");
-
+        CommentController::commentSave($request,$handlerId,$trackerId,"Error Correction","CorrectionError","CorID");
 
         return redirect('birth-certificates/correction/2/request');
-
 
     }
 
@@ -201,21 +331,30 @@ class BirthErrorCorrectionController extends Controller
 
     public  function issueRequest($tab) {
 
-        $issues =     DB::table('ServApplicationTracker as sap')
+        $issues =  DB::table('ServApplicationTracker as sap')
+            ->select('st.ServTypeName','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
+
             ->where('sap.ServiceTypeID','=',3)
-            ->where('sap.ApplicationStatusID','=',3)
-            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.NearestRitaOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.ApplicationStatusID','=',10)
+            ->where('sap.IssueHandlerID','=',null)
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
-
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
 
         if (Auth::user()->IsHQ==1) {
 
             $issues =     DB::table('ServApplicationTracker as sap')
+                ->select('st.ServTypeName','sap.TrackerID','as.StatusName','sap.CreatedDate','cr.ChildFname','cr.ChildMname','cr.ChildSurname ','sap.ApplicationID','ro.OfficeName as ProcessingOffice','nro.OfficeName as NearOffice')
                 ->where('sap.ServiceTypeID','=',3)
-                ->where('sap.ApplicationStatusID','=',3)
+
+                ->where('sap.ApplicationStatusID','=',10)
+                ->where('sap.IssueHandlerID','=',null)
+                ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
                 ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
                 ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
                 ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
@@ -231,7 +370,11 @@ class BirthErrorCorrectionController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->get();
 
-        return view('births.change_certificate_details.tab_issue',compact('tab','issues','printed'));
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+
+        return view('births.change_certificate_details.tab_issue',compact('regions','districts','tab','issues','printed'));
 
     }
 
@@ -244,16 +387,24 @@ class BirthErrorCorrectionController extends Controller
         $is_result= false;
         $issue_search  =  true;
 
+        DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['IssueHandlerId'=>$handlerId]);
+
         $ddata =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',3)
-            ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
+            ->where('sap.IssueHandlerID','=',$handlerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->first();
 
+        if (!$ddata){
+
+            Session::flash('aler-warning','Error!, There Was a Problem, Contact Administrator');
+
+            return redirect()->back();
+        }
 //        return response()->json($ddata);
         return view('births.change_certificate_details.view_issue_error_data',compact('issue_search','is_result','verify','issue','ddata'));
 
@@ -284,14 +435,20 @@ class BirthErrorCorrectionController extends Controller
 
         $ddata =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',3)
-            ->where('sap.HandlerID','=',$handlerId)
-            ->where('sap.TrackerID','=',$trackerId)
+
+            ->where('sap.IssueHandlerID','=',$handlerId)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('CorrectionError as cr','cr.CorID','sap.ApplicationID')->first();
 
+        if (!$ddata){
+
+            Session::flash('alert-warning','Error!, There Was a Problem, Contact Administrator');
+
+            return redirect()->back();
+        }
         $result=  DB::table('DataInfo')->where('EntryNo','=',$entryNo)->first();
 
 //                    return response()->json($result);
@@ -309,15 +466,10 @@ class BirthErrorCorrectionController extends Controller
 
         $status =  5;
 
-        $type  = 5;
-
-//        $servApp  = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->first();
-//
-//        $applicationId =  $servApp->ApplicationID;
-//        $entryNo  =  DB::table('BirthService')->where('BirthServID',$applicationId)->first()->EntryNo;
-
+        $type  = 2;
 
         $entryNo =  $request->entryNo;
+
 
         if (!$entryNo){
 
@@ -331,7 +483,7 @@ class BirthErrorCorrectionController extends Controller
 
         $handlerId  =  Auth::user()->StaffID;
 
-        CommentController::commentSave($request,$handlerId,$trackerId,"Verify");
+        CommentController::commentSave($request,$handlerId,$trackerId,"Verify","CorrectionError","CorID");
 
 
         return redirect('/reports/certificate/'.$entryNo.'/view/'.$type);

@@ -4,7 +4,7 @@
 
 @section('heading-title')
 
-    <h2>Informant Details</h2>
+    <h2>Informant  Details</h2>
 
 @endsection
 @section('content')
@@ -13,13 +13,7 @@
 
     <div class="col-md-12">
 
-        @foreach (['danger', 'warning', 'success', 'info'] as $msg)
-            @if(Session::has('alert-' . $msg))
-
-                <p class="alert alert-{{ $msg }}" style="color: white;">{{ Session::get('alert-' . $msg) }}
-                    <a href="#" class="close" data-dismiss="alert" aria-label="close"></a></p>
-            @endif
-        @endforeach
+    @include('partials.flash_error')
 
     </div>
     <div class="col-md-12">

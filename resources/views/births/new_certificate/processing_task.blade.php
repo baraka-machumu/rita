@@ -14,7 +14,7 @@
                     <th>Processing Office</th>
                     <th>Near Office</th>
                     <th>Application Status</th>
-
+                    <th>Application ID</th>
                     <th>Date</th>
 
                     <th>Action</th>
@@ -31,7 +31,7 @@
                         <td>{{$newBirthRegProcessingTask->ProcessingOffice}}</td>
                         <td>{{$newBirthRegProcessingTask->NearOffice}}</td>
                         <td>{{$newBirthRegProcessingTask->StatusName}}</td>
-
+                        <td>{{$newBirthRegProcessingTask->ApplicationID}}</td>
                         <td>{{$newBirthRegProcessingTask->CreatedDate}}</td>
 
                         <td>

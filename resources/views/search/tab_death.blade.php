@@ -20,7 +20,7 @@
 
                         <a   class="nav-link" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">
 
-                            Issue
+                            Request
 
                         </a>
 {{--                    @endif--}}
@@ -32,7 +32,7 @@
                 <li class="nav-item">
                     <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
 
-                        Printed
+                        My Task
 
                     </a>
                 </li>
@@ -42,12 +42,12 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
-                    @include('deaths.new_certificate.issue')
+                    @include('search.new_death_search_service_list')
 
                 </div>
                 <div class="tab-pane fade " id="profile" role="tabpanel" aria-labelledby="profile-tab">
 
-                    @include('deaths.new_certificate.prints')
+                    @include('search.my_task_new_death_search_service_list')
 
                 </div>
 

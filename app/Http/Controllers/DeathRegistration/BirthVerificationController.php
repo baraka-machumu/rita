@@ -20,13 +20,33 @@ class BirthVerificationController extends Controller
     public  function index($tab) {
 
         $verifications=  DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
+            ->where('sap.ApplicationStatusID','=',1)
+
             ->where('sap.ServiceTypeID','=',11)
             ->where('sap.HandlerID','=',null)
+            ->where('sap.NearestRitaOfficeID',Auth::user()->RitaOfficeID)
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
 
+        if (Auth::user()->IsHQ==1){
+
+            $verifications=  DB::table('ServApplicationTracker as sap')
+                ->select('*','nro.OfficeName as NearestOffice')
+                ->where('sap.ApplicationStatusID','=',1)
+
+                ->where('sap.ServiceTypeID','=',11)
+                ->where('sap.HandlerID','=',null)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
+
+        }
+
         $myTaskverifications=  DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
             ->where('sap.ServiceTypeID','=',11)
             ->where('sap.ApplicationStatusID','=',1)
             ->where('sap.HandlerID','=',Auth::user()->StaffID)
@@ -34,10 +54,57 @@ class BirthVerificationController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
 
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
 //        return response()->json($verifications);
-        return view('deaths.verify_certificate.tab_verify',compact('tab','myTaskverifications','verifications'));
+        return view('deaths.verify_certificate.tab_verify',compact('regions','districts','tab','myTaskverifications','verifications'));
 
     }
+
+
+    // function  to view all verification pro
+    public  function process($tab) {
+
+        $verifications=  DB::table('ServApplicationTracker as sap')
+            ->where('sap.ServiceTypeID','=',11)
+            ->where('sap.NextToActID','=',null)
+            ->where('sap.ApplicationStatusID','=',3)
+
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
+
+        if (Auth::user()->IsHQ==1){
+
+            $verifications=  DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',11)
+                ->where('sap.ApplicationStatusID','=',3)
+
+                ->where('sap.NextToActID','=',null)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
+
+        }
+
+        $myTaskverifications=  DB::table('ServApplicationTracker as sap')
+            ->where('sap.ServiceTypeID','=',11)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.NextToActID','=',Auth::user()->StaffID)
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('DeathVerification as bv','bv.DeathVerID','sap.ApplicationID')->get();
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+//        return response()->json($verifications);
+        return view('deaths.verify_certificate.tab_verify_process',compact('regions','districts','tab','myTaskverifications','verifications'));
+
+    }
+
 
     // function to assign task to rita staff
     public  function  myTask($trackerId){
@@ -123,7 +190,7 @@ class BirthVerificationController extends Controller
         $trackerId  =  $request->trackerId;
         $searchId =  $request->verificationId;
 
-        CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Death Verification");
+        CommentController::commentSave($request,Auth::user()->StaffID,$trackerId,"Death Verification",'BirthVerification','VerificationID');
         $status =  8;
 
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);

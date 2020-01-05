@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Search;
 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,24 +18,85 @@ class DeathSearchController extends Controller
         $this->middleware('auth');
     }
 
-     public  function  newBirthCertificateSearch(){
+     public  function  newBirthCertificateSearch($tab){
 
 //         dd(88);
 
          $cdata=  DB::table('ServApplicationTracker as sap')
+             ->select('*','nro.OfficeName as NearestOffice')
              ->where('sap.ServiceTypeID','=',10)
              ->where('sap.HandlerID','=',null)
+             ->where('sap.ApplicationStatusID','=',1)
+             ->where('sap.NearestRitaOfficeID','=',Auth::user()->RitaOfficeID)
+             ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
              ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
              ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
              ->join('DeathSearch as bv','bv.SearchID','sap.ApplicationID')->get();
 
+         $myTaskcdata=  DB::table('ServApplicationTracker as sap')
+             ->select('*','nro.OfficeName as NearestOffice')
+             ->where('sap.ServiceTypeID','=',10)
+             ->where('sap.HandlerID','=',Auth::user()->StaffID)
+             ->where('sap.NearestRitaOfficeID','=',Auth::user()->RitaOfficeID)
 
-         return view('search.new_death_search_service_list',compact('cdata'));
+             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+             ->where('sap.ApplicationStatusID','=',1)
+             ->where('sap.NearestRitaOfficeID','=',Auth::user()->RitaOfficeID)
+             ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+             ->join('DeathSearch as bv','bv.SearchID','sap.ApplicationID')->get();
+
+         $regions  =  HelperController::getRegions();
+         $districts =  HelperController::getDistricts();
+
+//         return response()->json($cdata);
+
+         return view('search.tab_death',compact('tab','regions','districts','cdata','myTaskcdata'));
 
      }
 
+    public  function  process($tab){
 
-     public  function  viewBirthCertificateSearch($trackerId){
+//         dd(88);
+
+        $cdata=  DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
+            ->where('sap.ServiceTypeID','=',10)
+            ->where('sap.NextToActID','=',null)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.ProcessingOfficeID','=',Auth::user()->RitaOfficeID)
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('DeathSearch as bv','bv.SearchID','sap.ApplicationID')->get();
+
+        $myTaskcdata=  DB::table('ServApplicationTracker as sap')
+            ->select('*','nro.OfficeName as NearestOffice')
+            ->where('sap.ServiceTypeID','=',10)
+            ->where('sap.NextToActID','=',Auth::user()->StaffID)
+            ->where('sap.ProcessingOfficeID','=',Auth::user()->RitaOfficeID)
+
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.NearestRitaOfficeID','=',Auth::user()->RitaOfficeID)
+            ->join('RitaOffice as nro','nro.RitaOfficeID','=','sap.NearestRitaOfficeID')
+
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('DeathSearch as bv','bv.SearchID','sap.ApplicationID')->get();
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+        return view('search.tab_death_process',compact('myTaskcdata','tab','regions','districts','cdata'));
+
+    }
+
+
+
+    public  function  viewBirthCertificateSearch($trackerId){
 
          $handlerId  =  Auth::user()->StaffID;
 

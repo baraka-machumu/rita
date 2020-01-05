@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BirthRegistration;
 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helper\HelperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,45 +17,61 @@ class BirthChangeRequestController extends Controller
     {
         $this->middleware('auth');
     }
+
     // function data handle all new birth registrations. goes here.
     public  function index($tab) {
 
         $dublicates =     DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',7)
             ->where('sap.HandlerID','=',null)
-            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->where('sap.NearestRitaOfficeID',Auth::user()->RitaOfficeID)
+
+//            ->where('bs.IsOldEntryNo','=',1)
+//            ->where('bs.EntryAproved','=','0')
 
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
+            ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
+
+            ->get();
+
+//        return response()->json($dublicates);
 
         if (Auth::user()->IsHQ==1){
 
             $dublicates =     DB::table('ServApplicationTracker as sap')
                 ->where('sap.ServiceTypeID','=',7)
                 ->where('sap.HandlerID','=',null)
+                ->where('bs.IsOldEntryNo','=',1)
+                ->where('bs.EntryAproved','=','0')
                 ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
                 ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
                 ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-                ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+                ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')->get();
 
 
         }
 
             $myTaskDuplicates=  DB::table('ServApplicationTracker as sap')
-            ->where('sap.ServiceTypeID','=',7)
-            ->where('sap.ApplicationStatusID','=',1)
-            ->where('sap.HandlerID','=',Auth::user()->StaffID)
-            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
-            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
-            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+                ->where('sap.ServiceTypeID','=',7)
+                ->where('sap.HandlerID','=',null)
+                ->where('bs.IsOldEntryNo','=',1)
+                ->where('bs.EntryAproved','=','0')
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')->get();
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
 
 //        return response()->json($myTaskDuplicates);
-        return view('births.replace_old_certificate.tab_replace',compact('tab','dublicates','myTaskDuplicates'));
+        return view('births.replace_old_certificate.tab_replace',compact('regions','districts','tab','dublicates','myTaskDuplicates'));
 
     }
 
@@ -85,21 +102,81 @@ class BirthChangeRequestController extends Controller
 
         $is_check_modal=  false;
 
-        $ddata =     DB::table('ServApplicationTracker as sap')
+        $ddata =      DB::table('ServApplicationTracker as sap')
             ->where('sap.ServiceTypeID','=',7)
-            ->where('sap.HandlerID','=',$handlerId)
-            ->where('sap.TrackerID','=',$trackerId)
+            ->where('sap.HandlerID','=',null)
+            ->where('bs.IsOldEntryNo','=',1)
+            ->where('bs.EntryApproved','=','0')
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->first();
+            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')->first();
 
 //        dd(444);
         return view('births.replace_old_certificate.view_replace_data',compact('is_check_modal','is_result','verify','issue','ddata'));
 
     }
 
+    public  function processing($tab=1) {
+
+        $processing  =     DB::table('ServApplicationTracker as sap')
+            ->where('sap.ServiceTypeID','=',7)
+            ->where('sap.HandlerID','=',null)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+
+        if (Auth::user()->IsHQ==1){
+
+            $processing =     DB::table('ServApplicationTracker as sap')
+                ->where('sap.ServiceTypeID','=',7)
+                ->where('sap.HandlerID','=',null)
+                ->where('sap.ApplicationStatusID','=',3)
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+                ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+
+        }
+
+        $myTaskProcessing  =DB::table('ServApplicationTracker as sap')
+            ->where('sap.ServiceTypeID','=',7)
+            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.HandlerID','=',Auth::user()->StaffID)
+            ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
+            ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
+            ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+            ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+            ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+//        return response()->json($myTaskProcessing);
+        return view('births.replace_old_certificate.tab_replace_processing',compact('regions','districts','tab','processing','myTaskProcessing'));
+
+    }
+
+    public  function  processingRequest($trackerId){
+
+        $nextToActId =  Auth::user()->StaffID;
+
+        DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['NextToActID'=>$nextToActId]);
+
+        $tab  =  2;
+
+        Session::flash('alert-success','Task Taken');
+
+
+        return redirect('birth-certificates/'.$tab.'/replace-processing');
+
+    }
 
 
     public function serachByEntryNumber(Request $request,$trackerId){
@@ -163,7 +240,7 @@ class BirthChangeRequestController extends Controller
         $handlerId  =  Auth::user()->StaffID;
         DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$status]);
 
-        CommentController::commentSave($request,$handlerId,$trackerId,"Verify");
+        CommentController::commentSave($request,$handlerId,$trackerId,"Issue",'OldToNew','OldID');
 
         return redirect('birth-certificates/replace/1/request');
 
@@ -178,7 +255,7 @@ class BirthChangeRequestController extends Controller
 //            ->where('sap.HandlerID','=',Auth::user()->StaffID)
             ->where('sap.ProcessingOfficeID',Auth::user()->RitaOfficeID)
 
-            ->where('sap.ApplicationStatusID','=',3)
+            ->where('sap.ApplicationStatusID','=',10)
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
@@ -189,7 +266,7 @@ class BirthChangeRequestController extends Controller
             $issues =     DB::table('ServApplicationTracker as sap')
                 ->where('sap.ServiceTypeID','=',7)
 //                ->where('sap.HandlerID','=',Auth::user()->StaffID)
-                ->where('sap.ApplicationStatusID','=',3)
+                ->where('sap.ApplicationStatusID','=',10)
                 ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
                 ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
@@ -208,8 +285,10 @@ class BirthChangeRequestController extends Controller
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
             ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->get();
 
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
 
-        return view('births.replace_old_certificate.tab_issue',compact('tab','issues','printed'));
+        return view('births.replace_old_certificate.tab_issue',compact('regions','districts','tab','issues','printed'));
 
     }
 
@@ -269,11 +348,13 @@ class BirthChangeRequestController extends Controller
             ->where('sap.ServiceTypeID','=',7)
             ->where('sap.HandlerID','=',$handlerId)
             ->where('sap.TrackerID','=',$trackerId)
+            ->where('bs.IsOldEntryNo','=',1)
+            ->where('bs.EntryApproved','=','0')
             ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
             ->join('ServiceType as st','st.ServTypeID','=','sap.ServiceTypeID')
 
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
-            ->join('OldToNew as ol','ol.OldID','sap.ApplicationID')->first();
+            ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')->first();
 
         $result=   DB::table('DataInfo as d')
             ->where('d.EntryNo','=',$entryNo)
@@ -297,7 +378,7 @@ class BirthChangeRequestController extends Controller
 
         $handlerId  =  Auth::user()->StaffID;
 
-        CommentController::commentSave($request,$handlerId,$trackerId,"Verify");
+        CommentController::commentSave($request,$handlerId,$trackerId,"Issue",'OldToNew','OldID');
 
         $type  = 2;
 

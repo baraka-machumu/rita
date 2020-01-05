@@ -31,6 +31,11 @@ class BirthRegistrationController extends Controller
 
     public  function  newRequest($tab){
 
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+
         $newBirthRegistrations =  DB::table('ServApplicationTracker as sap')
             ->where('HandlerID','=',null)
             ->where('sap.NearestRitaOfficeID',Auth::user()->RitaOfficeID)
@@ -41,9 +46,10 @@ class BirthRegistrationController extends Controller
             ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
             ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
 
-            ->get();
+            ->latest("sap.CreatedDate")->get();
 
         if (Auth::user()->IsHQ==1){
+
 
             $newBirthRegistrations =  DB::table('ServApplicationTracker as sap')
                 ->where('HandlerID','=',null)
@@ -78,7 +84,25 @@ class BirthRegistrationController extends Controller
 
             ->get();
 
-        return view('births.new_certificate.tab_request',compact('newBirthRegPendings','tab','newBirthRegistrations'));
+
+        if (Auth::user()->IsHQ==1){
+
+            $newBirthRegPendings =  DB::table('ServApplicationTracker as sap')
+                ->where([
+//                    ['HandlerID','=',$handlerId],
+                    ['sap.ApplicationStatusID','=',$statusId],
+                ])
+                ->select('sap.TrackerID','as.StatusName','sap.CreatedDate','pi.FirstName','pi.SurName','sap.ApplicationID','ro.OfficeName as ProcessingOffice','ronear.OfficeName as NearOffice')
+                ->join('BirthService as bs','bs.BirthServID','sap.ApplicationID')
+                ->join('PersonalInfo as pi','pi.PersonalID','=','bs.ChildID')
+                ->join('RitaOffice as ro','ro.RitaOfficeID','=','sap.ProcessingOfficeID')
+                ->join('RitaOffice as ronear','ronear.RitaOfficeID','=','sap.NearestRitaOfficeID')
+                ->join('ApplicationStatus as as','as.StatusID','=','sap.ApplicationStatusID')
+
+                ->get();
+        }
+
+        return view('births.new_certificate.tab_request',compact('districts','regions','newBirthRegPendings','tab','newBirthRegistrations'));
 
     }
 
@@ -86,6 +110,10 @@ class BirthRegistrationController extends Controller
 
 
     public  function  newProcessing($tab){
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
 
         $handlerId  =  Auth::user()->StaffID;
         $statusCode  =  301;
@@ -150,7 +178,7 @@ class BirthRegistrationController extends Controller
 
             ->get();
 
-        return view('births.new_certificate.tab_processing',compact('newBirthRegProcessingTasks','tab','newBirthRegProcessingRequests'));
+        return view('births.new_certificate.tab_processing',compact('regions','districts','newBirthRegProcessingTasks','tab','newBirthRegProcessingRequests'));
 
     }
 
@@ -226,7 +254,11 @@ class BirthRegistrationController extends Controller
 
             ->get();
 
-        return view('births.new_certificate.tab_issue',compact('newBirthRegissues','tab','newBirthprints'));
+
+        $regions  =  HelperController::getRegions();
+        $districts =  HelperController::getDistricts();
+
+        return view('births.new_certificate.tab_issue',compact('regions','districts','newBirthRegissues','tab','newBirthprints'));
 
     }
 
@@ -485,8 +517,8 @@ class BirthRegistrationController extends Controller
 
         if ($success){
 
-            $this->commentSave($request,$handlerId,$trackerId,"Request");
 
+            CommentController::commentSave($request,$handlerId,$trackerId,"Verify",'BirthService','BirthServID');
             Session::flash('alert-success','Successful Verified');
 
         }
@@ -556,8 +588,7 @@ class BirthRegistrationController extends Controller
         $success = DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['ApplicationStatusID'=>$statusId]);
 
         if ($success){
-
-            $this->commentSave($request,$handlerId,$trackerId,"Approve");
+            CommentController::commentSave($request,$handlerId,$trackerId,"Approve",'BirthService','BirthServID');
 
             Session::flash('alert-success','Successful Approved');
         }
@@ -615,10 +646,10 @@ class BirthRegistrationController extends Controller
         $servTypeId  =  1;//$servApp->ServiceTypeID;
 
 
-        CommentController::commentSave($request,$handlerId,$trackerId,"Issue");
+        CommentController::commentSave($request,$handlerId,$trackerId,"Issue",'BirthService','BirthServID');
 
 
-       DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['NoCopyPrinted'=>$servApp->NoCopyPrinted+1]);
+        DB::table('ServApplicationTracker')->where('TrackerID',$trackerId)->update(['NoCopyPrinted'=>$servApp->NoCopyPrinted+1]);
 
         $result = DB::select('EXEC  Update_ApplicationEntryNo_SP ?,?,?,?',array($applicationId,$servTypeId,$handlerId,null));
 
@@ -686,8 +717,8 @@ class BirthRegistrationController extends Controller
     }
 
 
-
     public  function  getComments($trackerId){
+
 
        $comments  =  DB::table('Comments as c')
            ->select('s.Username','c.CommentType','c.Comment','c.TrackerID','c.Date')
@@ -698,4 +729,6 @@ class BirthRegistrationController extends Controller
        return $comments;
 
     }
+
+
 }

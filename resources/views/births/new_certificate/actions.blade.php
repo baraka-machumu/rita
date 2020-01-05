@@ -27,7 +27,7 @@
 
                 <div class="form-group">
                     <label>Comment</label>
-                    <textarea rows="2" name="comments" class="form-control"></textarea>
+                    <textarea rows="2" name="comment" required class="form-control"></textarea>
 
                 </div>
             </form>
@@ -42,7 +42,7 @@
                 <a href="#" class="btn btn-info">Return</a>
                 <div class="form-group">
                     <label>Comment</label>
-                    <textarea rows="2" name="comments" class="form-control"></textarea>
+                    <textarea rows="2" name="comment" required class="form-control"></textarea>
 
                 </div>
             </form>
@@ -59,7 +59,7 @@
                 <a href="#" class="btn btn-info">Return</a>
                 <div class="form-group">
                     <label>Comment</label>
-                    <textarea rows="2" name="comments" class="form-control"></textarea>
+                    <textarea rows="2" name="comment" required class="form-control"></textarea>
 
                 </div>
             </form>

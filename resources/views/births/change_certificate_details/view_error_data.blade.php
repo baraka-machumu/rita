@@ -4,7 +4,7 @@
 
 @section('heading-title')
 
-    <h2>Informant Details </h2>
+    <h2>Informant Details</h2>
 
 
 @endsection

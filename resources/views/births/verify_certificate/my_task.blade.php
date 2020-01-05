@@ -24,7 +24,6 @@
 
             <tbody>
 
-
             @foreach($myTaskverifications as $index=>$verification)
                 <tr>
                     <td>{{$index+1}}</td>
@@ -38,6 +37,7 @@
                     <td>
 
                         <a href="{{url('birth-certificates/verify/view-request',$verification->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+
                     </td>
 
                 </tr>

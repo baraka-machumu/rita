@@ -2,8 +2,16 @@
 <div class="row" style="margin-top: 20px;">
 
     <div class="col-md-12">
+        @if (Auth::user()->IsHQ==1)
 
-        <table class="table table-bordered table-striped table-search" id="datatable">
+            <?php
+            $statusId  = 3;
+            $btnName = "btn-filter-requests-old-to-new";
+            ?>
+            @include('helpers.filer_form',compact('statusId','btnName'))
+
+        @endif
+        <table class="table table-bordered table-striped table-birth-request-old-to-new" id="datatable">
 
             <thead>
 

@@ -59,14 +59,20 @@
             </table>
 
 
-            <form action="{{url('birth-certificates/search/exist',$cdata->TrackerID)}}" method="post">
+            @if($processing)
+                <form action="{{url('birth-certificates/search/exist/process',$cdata->TrackerID)}}" method="post">
 
-                {{csrf_field()}}
+                    @else
+                        <form action="{{url('birth-certificates/search/exist',$cdata->TrackerID)}}" method="post">
 
-                <input type="hidden" value="{{$cdata->EntryNo}}" name="entryNumberSearch">
-                <button type="submit" class="btn btn-primary">Search</button>
+                            @endif
 
-            </form>
+                            {{csrf_field()}}
+
+                            <input type="hidden" value="{{$cdata->EntryNo}}" name="entryNumberSearch">
+                            <button type="submit" class="btn btn-primary">Search</button>
+
+                        </form>
 
         </div>
         <div class="col-md-6">
@@ -137,7 +143,7 @@
                             <td>1</td>
                             <td>{{$result->Fname}}</td>
                             <td>{{$result->Mname}}</td>
-                            <td>{{$result->Sname}}</td>
+                            <td>{{$result->Surname}}</td>
                             <td>{{$result->DOB}}</td>
                             <td>
 
@@ -146,7 +152,7 @@
                             </td>
                         </tr>
 
-                        @else
+                    @else
 
                         <tr>
                             <td colspan="12">No Data Found</td>
@@ -157,24 +163,44 @@
                     </tbody>
                 </table>
 
+                @if($processing)
+                    <form action="{{url('birth-certificates/search/process-approve')}}"  method="post">
 
-                <form action="{{url('birth-certificates/search/send-back-result')}}"  method="post">
+                        {{csrf_field()}}
+                        <div class="form-group">
 
-                    {{csrf_field()}}
-                    <div class="form-group">
+                            <label for="comment">Comment</label>
+                            <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
 
-                        <label for="comment">Comment</label>
-                        <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
+                            <input type="hidden" name="trackerId" value="{{$cdata->TrackerID}}">
+                            <input type="hidden" name="searchId" value="{{$cdata->SearchID}}">
 
-                        <input type="hidden" name="trackerId" value="{{$cdata->TrackerID}}">
-                        <input type="hidden" name="searchId" value="{{$cdata->SearchID}}">
+                            <button type="submit" name="send-back-result" class="btn btn-success">Approve</button>
 
-                        <button type="submit" name="send-back-result" class="btn btn-success">Commit</button>
+                        </div>
 
-                    </div>
+                    </form>
 
-                </form>
-                <a href="{{url()->previous()}}" class="btn btn-info">Back</a>
+                @else
+                    <form action="{{url('birth-certificates/search/send-back-result')}}"  method="post">
+
+                        {{csrf_field()}}
+                        <div class="form-group">
+
+                            <label for="comment">Comment</label>
+                            <textarea class="form-control" rows="2" name="comment" id="comment"></textarea>
+
+                            <input type="hidden" name="trackerId" value="{{$cdata->TrackerID}}">
+                            <input type="hidden" name="searchId" value="{{$cdata->SearchID}}">
+
+                            <button type="submit" name="send-back-result" class="btn btn-success">Verify</button>
+
+                        </div>
+
+                    </form>
+                @endif
+
+                <a href="{{url()->previous()}}" class="btn btn-info">Return</a>
 
 
             </div>

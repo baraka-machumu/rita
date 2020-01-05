@@ -4,7 +4,7 @@
         <div class="col-md-12">
 
             @include('partials.flash_error')
-            <table class="table table-bordered table-striped table-search" id="datatable">
+            <table class="table table-bordered table-striped" id="datatable-pr">
 
                 <thead>
 
@@ -14,7 +14,7 @@
                     <th>Processing Office</th>
                     <th>Near Office</th>
                     <th>Application Status</th>
-
+                    <th>Application ID</th>
                     <th>Date</th>
 
                     <th>Action</th>
@@ -23,9 +23,6 @@
                 </thead>
 
                 <tbody>
-
-
-
                 @foreach($newBirthRegPendings as $index=>$newBirthRegPending)
                     <tr>
                         <td>{{$index+1}}</td>
@@ -33,7 +30,7 @@
                         <td>{{$newBirthRegPending->ProcessingOffice}}</td>
                         <td>{{$newBirthRegPending->NearOffice}}</td>
                         <td>{{$newBirthRegPending->StatusName}}</td>
-
+                        <td>{{$newBirthRegPending->ApplicationID}}</td>
                         <td>{{$newBirthRegPending->CreatedDate}}</td>
 
                         <td>

@@ -12,10 +12,17 @@
             </div>
             <div class="modal-body">
 
-                <form action="{{url('birth-certificates/correction/verify',$ddata->TrackerID)}}" id="form-send-back-result-verify"  method="post">
-                    {{csrf_field()}}
+                @if($processing)
 
-                    <input type="hidden" name="applicationId" value="{{$ddata->ApplicationID}}">
+                    <form action="{{url('birth-certificates/correction/process-approve',$ddata->TrackerID)}}" id="form-send-back-result-verify"  method="post">
+                        {{csrf_field()}}
+                        @else
+
+                            <form action="{{url('birth-certificates/correction/verify',$ddata->TrackerID)}}" id="form-send-back-result-verify"  method="post">
+                                {{csrf_field()}}
+
+                                @endif
+                                <input type="hidden" name="applicationId" value="{{$ddata->ApplicationID}}">
                     <input type="hidden" name="frontUserId" value="{{$ddata->FrontUserID}}">
 
                     <input type="hidden" name="changedeCode" value="{{$ddata->ChangedCode}}">
@@ -151,9 +158,15 @@
 
                         <div class="form-group">
 
-                            <button type="submit" id="send-back-result-verify" name="send-back-result" class="btn btn-success">Verify</button>
+                            @if($processing)
+                                <button type="submit" id="send-back-result-verify" name="send-back-result" class="btn btn-success">Approve</button>
 
-{{--                            <a href="{{url('birth-certificates/correction/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>--}}
+                            @else
+                                <button type="submit" id="send-back-result-verify" name="send-back-result" class="btn btn-success">Verify</button>
+
+                            @endif
+
+                            {{--                            <a href="{{url('birth-certificates/correction/return',$ddata->TrackerID)}}" class="btn btn-success">Return</a>--}}
 
                         </div>
                 </div>

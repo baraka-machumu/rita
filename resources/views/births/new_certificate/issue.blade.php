@@ -3,7 +3,17 @@
 
         <div class="col-md-12">
 
-            <table class="table table-bordered table-striped table-search" id="datatable">
+            @if (Auth::user()->IsHQ==1)
+
+                <?php
+                $statusId  = 10;
+                $btnName  = 'btn-filter-requests';
+                ?>
+                @include('helpers.filer_form',compact('statusId','btnName'))
+
+            @endif
+
+            <table class="table table-bordered table-striped table-birth-request" id="datatable">
 
                 <thead>
 
@@ -13,6 +23,7 @@
                     <th>Processing Office</th>
                     <th>Near Office</th>
                     <th>Application Status</th>
+                    <th>Application ID</th>
 
                     <th>Date</th>
 
@@ -30,7 +41,7 @@
                         <td>{{$newBirthRegissue->ProcessingOffice}}</td>
                         <td>{{$newBirthRegissue->NearOffice}}</td>
                         <td style="color: #097689; font-size: 17px;">{{$newBirthRegissue->StatusName}}</td>
-
+                        <td>{{$newBirthRegissue->ApplicationID}}</td>
                         <td>{{$newBirthRegissue->CreatedDate}}</td>
 
                         <td>

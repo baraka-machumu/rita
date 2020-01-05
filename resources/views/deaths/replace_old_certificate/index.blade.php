@@ -3,7 +3,16 @@
 
         <div class="col-md-12">
 
-            <table class="table table-bordered table-striped table-search" id="datatable">
+            @if (Auth::user()->IsHQ==1)
+
+                <?php
+                $statusId  = 1;
+                $btnName = "btn-filter-death-requests-old-to-new";
+                ?>
+                @include('helpers.filer_form',compact('statusId','btnName'))
+
+            @endif
+            <table class="table table-bordered table-striped table-death-request-old-to-new " id="datatable">
 
                 <thead>
 
@@ -28,7 +37,7 @@
                     <tr>
                         <td>{{$index+1}}</td>
 
-                        <td>{{$dublicate->ChildFname.' '.$dublicate->ChildMname.' '.$dublicate->ChildSurname}}</td>
+                        <td>{{$dublicate->DeceasedFname.' '.$dublicate->DeceasedMname.' '.$dublicate->DeceasedSurname}}</td>
                         <td>{{$dublicate->OfficeName}}</td>
                         <td>{{$dublicate->ServTypeName}}</td>
                         <td>{{$dublicate->StatusName}}</td>

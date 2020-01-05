@@ -1,16 +1,16 @@
 
-@extends('layouts.master')
-
-@section('heading-title')
-
-    <h2>Search Requests</h2>
-@endsection
-@section('content')
-
     <div class="row top-margin-tab">
 
         <div class="col-md-12">
+            @if (Auth::user()->IsHQ==1)
 
+                <?php
+                $statusId  = 1;
+                $btnName = "btn-filter-requests-search";
+                ?>
+                @include('helpers.filer_form',compact('statusId','btnName'))
+
+            @endif
             @include('partials.flash_error')
 
             <table class="table table-striped">
@@ -30,7 +30,7 @@
         <div class="col-md-12">
 
 
-            <table class="table table-bordered table-striped" id="datatable">
+            <table class="table table-bordered table-striped table-birth-request-search" id="datatable">
 
                 <thead>
 
@@ -42,6 +42,8 @@
                     <th>Last Name</th>
                     <th>Date Of Birth</th>
 
+                    <td>Processing Office</td>
+                    <td>Nearest Office</td>
                     <th>Action</th>
 
                 </tr>
@@ -59,9 +61,11 @@
                         <td>{{$result->ChildMname}}</td>
                         <td>{{$result->ChildSurname}}</td>
                         <td>{{$result->DoB}}</td>
+                        <td>{{$result->OfficeName}}</td>
+                        <td>{{$result->NearestOffice}}</td>
                         <td>
 
-                            <a href="{{url('birth-certificates/search/view',$result->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                            <a href="{{url('birth-certificates/search/request/my-task',$result->TrackerID)}}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
 
                         </td>
                     </tr>
@@ -79,4 +83,3 @@
 
     </div>
 
-@endsection

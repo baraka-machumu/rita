@@ -3,7 +3,16 @@
 
         <div class="col-md-12">
 
-            <table class="table table-bordered table-striped table-search" id="datatable">
+            @if (Auth::user()->IsHQ==1)
+
+                <?php
+                $statusId  = 10;
+                $btnName = "btn-filter-death-requests";
+                ?>
+                @include('helpers.filer_form',compact('statusId','btnName'))
+
+            @endif
+            <table class="table table-bordered table-striped table-death-request" id="datatable">
 
                 <thead>
 
